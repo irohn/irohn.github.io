@@ -21,7 +21,6 @@
       font-size: 48px;
       color: #333; /* Black color */
       position: relative;
-      z-index: 1; /* Ensure name is on top of bubbles */
     }
 
     /* Create the bubble animation */
@@ -53,6 +52,7 @@
   </style>
 </head>
 <body>
+
   <h1>irohn</h1>
 
   <!-- Optional: If you want to add some JavaScript functionality -->
@@ -60,30 +60,65 @@
     // Define the function to create bubbles
     function createBubbles() {
       // Get the number of bubbles from user input or set a default value
-      var numBubbles = 30; // Default value
+      var numBubbles = 90; // Default value
       // Adjust this number to control how many bubbles there are
 
       // Loop to create bubbles
       for (var i = 0; i < numBubbles; i++) {
-        // Create a new bubble element
-        var bubble = document.createElement("div");
-        bubble.classList.add("bubble");
-
-        // Set random position on the X-axis
-        var randomX = Math.floor(Math.random() * window.innerWidth);
-        bubble.style.left = randomX + "px";
-
-        // Set random animation delay
-        var randomDelay = Math.random() * 5; // Random delay up to 5 seconds
-        bubble.style.animationDelay = randomDelay + "s";
-
-        // Set random animation duration
-        var randomDuration = Math.random() * 5 + 3; // Random duration between 3 and 8 seconds
-        bubble.style.animationDuration = randomDuration + "s";
-
-        // Append the bubble to the body
-        document.body.appendChild(bubble);
+        createBubble();
       }
+
+      // Add event listener for mousemove
+      document.addEventListener("mousemove", function(event) {
+        var mouseX = event.clientX;
+        var mouseY = event.clientY;
+
+        // Loop through all bubbles
+        var bubbles = document.getElementsByClassName("bubble");
+        for (var i = 0; i < bubbles.length; i++) {
+          var bubble = bubbles[i];
+          var bubbleRect = bubble.getBoundingClientRect();
+
+          // Check collision with mouse
+          if (
+            mouseX > bubbleRect.left &&
+            mouseX < bubbleRect.right &&
+            mouseY > bubbleRect.top &&
+            mouseY < bubbleRect.bottom
+          ) {
+            // Pop the bubble
+            bubble.remove();
+            createBubble(); // Regenerate a new bubble
+          }
+        }
+      });
+    }
+
+    // Function to create a single bubble
+    function createBubble() {
+      // Create a new bubble element
+      var bubble = document.createElement("div");
+      bubble.classList.add("bubble");
+
+      // Set random position on the X-axis
+      var randomX = Math.floor(Math.random() * window.innerWidth);
+      bubble.style.left = randomX + "px";
+
+      // Set random animation delay
+      var randomDelay = Math.random() * 2; // Random delay up to 5 seconds
+      bubble.style.animationDelay = randomDelay + "s";
+
+      // Set random animation duration
+      var randomDuration = Math.random() * 3 + 2; // Random duration between 3 and 8 seconds
+      bubble.style.animationDuration = randomDuration + "s";
+
+      // Set random size for the bubble
+      var randomSize = Math.floor(Math.random() * (50 - 20 + 1)) + 20; // Random size between 20 and 50 pixels
+      bubble.style.width = randomSize + "px";
+      bubble.style.height = randomSize + "px";
+
+      // Append the bubble to the body
+      document.body.appendChild(bubble);
     }
 
     // Call the function to create bubbles when the page loads
