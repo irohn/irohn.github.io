@@ -1,129 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #d1a513; /* Specified yellow color */
-      overflow: hidden; /* Hide overflowing bubbles */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Arcade</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #fff;
+            --text-color: #333;
+            --hover-shadow: rgba(0,0,0,0.15);
+            --primary-color: #4a90e2;
+        }
 
-    h1 {
-      font-family: Arial, sans-serif;
-      font-size: 48px;
-      color: #333; /* Black color */
-      position: relative;
-    }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --card-bg: #2d2d2d;
+                --text-color: #e0e0e0;
+                --hover-shadow: rgba(0,0,0,0.4);
+                --primary-color: #64b5f6;
+            }
+        }
 
-    /* Create the bubble animation */
-    .bubble {
-      position: absolute;
-      bottom: -50px; /* Start from below the screen */
-      width: 30px; /* Set width */
-      height: 30px; /* Set height */
-      background-color: #ffe866; /* Lighter shade of yellow */
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Add shadow effect */
-      animation: floatBubble linear infinite; /* Animation properties */
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-    /* Define the animation keyframes */
-    @keyframes floatBubble {
-      0% {
-        transform: translateY(0); /* Start from bottom */
-        opacity: 0; /* Start with no opacity */
-      }
-      50% {
-        opacity: 1; /* Fade in halfway through animation */
-      }
-      100% {
-        transform: translateY(-100vh); /* Float to the top of the screen */
-        opacity: 0; /* Fade out at the end of animation */
-      }
-    }
-  </style>
+        header {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            opacity: 0.8;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            height: 200px;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px var(--hover-shadow);
+        }
+
+        .card-image {
+            height: 120px;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .card-content {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>irohn</h1>
+    <header>
+        <h1>Arcade</h1>
+        <p>Select a game to play</p>
+    </header>
 
-  <!-- Optional: If you want to add some JavaScript functionality -->
-  <script>
-    // Define the function to create bubbles
-    function createBubbles() {
-      // Get the number of bubbles from user input or set a default value
-      var numBubbles = 90; // Default value
-      // Adjust this number to control how many bubbles there are
+    <main class="game-grid">
+        <!-- Omok Game Card -->
+        <a href="omok-game/index.html" class="game-card">
+            <div class="card-image">
+                <span>⚪⚫</span>
+            </div>
+            <div class="card-content">
+                <div class="card-title">Omok</div>
+                <div class="card-desc">Classic 5-in-a-row strategy game.</div>
+            </div>
+        </a>
+        
+        <!-- Placeholder for future games -->
+        <!-- 
+        <a href="#" class="game-card" style="opacity: 0.5; pointer-events: none;">
+            <div class="card-image" style="background-color: #888;">?</div>
+            <div class="card-content">
+                <div class="card-title">Coming Soon</div>
+            </div>
+        </a> 
+        -->
+    </main>
 
-      // Loop to create bubbles
-      for (var i = 0; i < numBubbles; i++) {
-        createBubble();
-      }
-
-      // Add event listener for mousemove
-      document.addEventListener("mousemove", function(event) {
-        var mouseX = event.clientX;
-        var mouseY = event.clientY;
-
-        // Loop through all bubbles
-        var bubbles = document.getElementsByClassName("bubble");
-        for (var i = 0; i < bubbles.length; i++) {
-          var bubble = bubbles[i];
-          var bubbleRect = bubble.getBoundingClientRect();
-
-          // Check collision with mouse
-          if (
-            mouseX > bubbleRect.left &&
-            mouseX < bubbleRect.right &&
-            mouseY > bubbleRect.top &&
-            mouseY < bubbleRect.bottom
-          ) {
-            // Pop the bubble
-            bubble.remove();
-            createBubble(); // Regenerate a new bubble
-          }
-        }
-      });
-    }
-
-    // Function to create a single bubble
-    function createBubble() {
-      // Create a new bubble element
-      var bubble = document.createElement("div");
-      bubble.classList.add("bubble");
-
-      // Set random position on the X-axis
-      var randomX = Math.floor(Math.random() * window.innerWidth);
-      bubble.style.left = randomX + "px";
-
-      // Set random animation delay
-      var randomDelay = Math.random() * 2; // Random delay up to 5 seconds
-      bubble.style.animationDelay = randomDelay + "s";
-
-      // Set random animation duration
-      var randomDuration = Math.random() * 3 + 2; // Random duration between 3 and 8 seconds
-      bubble.style.animationDuration = randomDuration + "s";
-
-      // Set random size for the bubble
-      var randomSize = Math.floor(Math.random() * (50 - 20 + 1)) + 20; // Random size between 20 and 50 pixels
-      bubble.style.width = randomSize + "px";
-      bubble.style.height = randomSize + "px";
-
-      // Append the bubble to the body
-      document.body.appendChild(bubble);
-    }
-
-    // Call the function to create bubbles when the page loads
-    window.onload = createBubbles;
-  </script>
 </body>
 </html>
-
