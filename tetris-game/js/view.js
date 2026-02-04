@@ -13,16 +13,21 @@ class TetrisView {
     }
 
     resize() {
-        // Calculate cell size based on container
+        // Calculate cell size based on screen height to maximize size
         // Matrix is 10x20 visible.
-        const container = this.canvas.parentElement;
         const aspect = 10 / 20;
         
-        let h = container.clientHeight;
+        // Target height: 85% of screen height
+        // Subtract top bar (50px) + some margin (40px)
+        const availableHeight = window.innerHeight - 90;
+        const availableWidth = window.innerWidth - 200; // Account for side panel
+        
+        let h = availableHeight;
         let w = h * aspect;
         
-        if (w > container.clientWidth) {
-            w = container.clientWidth;
+        // If width is too wide for screen, scale down
+        if (w > availableWidth) {
+            w = availableWidth;
             h = w / aspect;
         }
         

@@ -51,35 +51,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function update(time) {
+        if (game.gameOver) {
+            endGame();
+            return;
+        }
+
         if (!lastTime) lastTime = time;
         const deltaTime = time - lastTime;
         lastTime = time;
 
-        if (!game.gameOver) {
-            // Gravity
-            // Calculate drop interval based on level (simplified curve)
-            // Lvl 1: 1000ms, Lvl 15: ~100ms
-            const speed = Math.max(100, Math.pow(0.8 - ((game.level - 1) * 0.007), game.level - 1) * 1000);
-            
-            dropCounter += deltaTime;
-            if (dropCounter > speed) {
-                game.move(0, 1);
-                dropCounter = 0;
-            }
-            
-            game.update(time); // Lock timer check
-            
-            if (game.gameOver) {
-                endGame();
-            }
+        // Gravity
+        // Calculate drop interval based on level (simplified curve)
+        // Lvl 1: 1000ms, Lvl 15: ~100ms
+        const speed = Math.max(100, Math.pow(0.8 - ((game.level - 1) * 0.007), game.level - 1) * 1000);
+        
+        dropCounter += deltaTime;
+        if (dropCounter > speed) {
+            game.move(0, 1);
+            dropCounter = 0;
+        }
+        
+        game.update(time); // Lock timer check
+        
+        // Check game over again after update/gravity
+        if (game.gameOver) {
+            endGame();
+            return;
         }
         
         view.draw();
         updateStats();
         
-        if (!game.gameOver) {
-            requestFrameId = requestAnimationFrame(update);
-        }
+        requestFrameId = requestAnimationFrame(update);
     }
 
     function updateStats() {

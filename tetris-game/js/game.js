@@ -233,14 +233,16 @@ class TetrisGame {
 
         // Commit to board
         const { x, y, shape, type } = this.activePiece;
+        let lockedCompletelyInHidden = true;
+
         for (let r = 0; r < shape.length; r++) {
             for (let c = 0; c < shape[r].length; c++) {
                 if (shape[r][c]) {
                     const by = y + r;
-                    // Game Over if locking above visible board (top 20 rows are buffer, 20 is start of visible)
-                    // Actually buffer is 0-19. Visible 20-39.
-                    // Top out: completely above visible.
                     
+                    // If any block is visible (row >= 20), then it's not completely hidden
+                    if (by >= 20) lockedCompletelyInHidden = false;
+
                     if (by < 0) continue; 
                     if (by < this.ROWS) {
                         this.board[by][x + c] = type;
@@ -248,13 +250,13 @@ class TetrisGame {
                 }
             }
         }
-
-        // Check Top Out
-        // If any block was placed in the buffer zone (rows 0-19) ??
-        // Actually, loose guideline: "Block pushed above 20-row buffer".
-        // Stricter: "Piece spawns overlapping".
-        // We'll stick to: if we can't spawn, game over.
         
+        // Game Over Condition 1: Lock Out (Entire piece locked in buffer zone)
+        if (lockedCompletelyInHidden) {
+            this.gameOver = true;
+            return;
+        }
+
         this.clearLines();
         this.spawnPiece();
     }
