@@ -108,10 +108,10 @@ const commands = {
       }
 
       if (node.type === "file") {
-        return output([basename(resolvedPath)]);
+        return output([createEntryToken(basename(resolvedPath), getEntryType(node, resolvedPath))]);
       }
 
-      return output(listDirectory(node));
+      return output(listDirectory(node, resolvedPath));
     },
   },
   mkdir: {
@@ -155,7 +155,7 @@ const commands = {
       }
 
       const target = args[0];
-      const command = commands[target];
+      const command = resolveCommand(target);
 
       if (!command) {
         return output([`${target} not found`]);
@@ -194,6 +194,14 @@ function readFile(node) {
 
 function output(lines) {
   return { type: "output", lines };
+}
+
+function createEntryToken(value, entryType) {
+  return {
+    type: "entry",
+    value,
+    entryType,
+  };
 }
 
 function buildHelpLines() {
@@ -292,16 +300,58 @@ function getNode(path) {
     }, fileSystem);
 }
 
-function listDirectory(node) {
+function findCommandByPath(path) {
+  return Object.values(commands).find((command) => command.path === path) ?? null;
+}
+
+function resolveCommand(commandName) {
+  if (commands[commandName]) {
+    return commands[commandName];
+  }
+
+  if (commandName.includes("/")) {
+    const resolvedPath = resolvePath(commandName);
+    const node = getNode(resolvedPath);
+
+    if (!node || node.type !== "file") {
+      return null;
+    }
+
+    return findCommandByPath(resolvedPath);
+  }
+
+  const binaryPath = `/bin/${commandName}`;
+  return findCommandByPath(binaryPath);
+}
+
+function listDirectory(node, directoryPath) {
   return Object.entries(node.children)
     .sort(([left], [right]) => left.localeCompare(right))
-    .map(([name, child]) => (child.type === "directory" ? `${name}/` : name));
+    .map(([name, child]) => {
+      const value = child.type === "directory" ? `${name}/` : name;
+      const childPath =
+        directoryPath === "/" ? `/${name}` : `${directoryPath}/${name}`;
+      return createEntryToken(value, getEntryType(child, childPath));
+    });
+}
+
+function getEntryType(node, path) {
+  if (node.type === "directory") {
+    return "directory";
+  }
+
+  if (path.startsWith("/bin/")) {
+    return "executable";
+  }
+
+  return "file";
 }
 
 function createLineElement(value, className = "terminal__line") {
   const line = document.createElement("p");
   line.className = className;
-  const segments = String(value).split(urlPattern);
+  const renderedValue = typeof value === "object" && value !== null ? value.value : String(value);
+  const segments = renderedValue.split(urlPattern);
 
   segments.forEach((segment) => {
     if (!segment) {
@@ -321,6 +371,10 @@ function createLineElement(value, className = "terminal__line") {
 
     line.append(segment);
   });
+
+  if (typeof value === "object" && value?.type === "entry") {
+    line.classList.add(`terminal__entry--${value.entryType}`);
+  }
 
   return line;
 }
@@ -397,7 +451,7 @@ function runCommand(rawValue) {
     return output([]);
   }
 
-  const command = commands[name];
+  const command = resolveCommand(name);
 
   if (!command) {
     return output([unknownCommandMessage]);

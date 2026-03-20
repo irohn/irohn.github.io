@@ -7,6 +7,9 @@
   --text-primary: #f5f5f5;
   --text-muted: #7a7a7a;
   --text-prompt: #a3ffb0;
+  --text-directory: #7fa8c9;
+  --text-executable: #8fb59b;
+  --text-file: #e7e7e7;
   --cursor-color: #f5f5f5;
   --font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono",
     Menlo, monospace;
@@ -141,6 +144,18 @@ body {
 
 .terminal__link:hover {
   color: #bae6fd;
+}
+
+.terminal__entry--directory {
+  color: var(--text-directory);
+}
+
+.terminal__entry--executable {
+  color: var(--text-executable);
+}
+
+.terminal__entry--file {
+  color: var(--text-file);
 }
 
 .terminal__text:empty::before {
