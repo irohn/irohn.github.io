@@ -11,6 +11,7 @@ const terminalLauncher = document.querySelector("#terminal-launcher");
 const closeButton = document.querySelector("#terminal-close");
 const minimizeButton = document.querySelector("#terminal-minimize");
 const maximizeButton = document.querySelector("#terminal-maximize");
+const themeToggle = document.querySelector("#theme-toggle");
 
 const siteName = "irohn.net";
 const homeDirectory = "/home/guest";
@@ -22,6 +23,8 @@ const urlPattern = /(https?:\/\/[^\s]+)/g;
 const maxHistoryLines = 1000;
 const bootCommand = "whoami";
 const bootDurationMs = 1000;
+const themeStorageKey = "irohn-theme-preference";
+const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
 let currentDirectory = homeDirectory;
 let isPinnedToBottom = true;
@@ -29,6 +32,7 @@ let isMaximized = false;
 let isInteractive = false;
 let needsBootSequence = true;
 let bootSequenceToken = 0;
+let themePreference = window.localStorage.getItem(themeStorageKey);
 
 const fileSystem = createDirectory({
   home: createDirectory({
@@ -261,6 +265,24 @@ function syncPrompt() {
 
 function scrollToBottom() {
   terminalBody.scrollTop = terminalBody.scrollHeight;
+}
+
+function getResolvedTheme() {
+  if (themePreference === "light" || themePreference === "dark") {
+    return themePreference;
+  }
+
+  return systemThemeQuery.matches ? "dark" : "light";
+}
+
+function applyTheme() {
+  const resolvedTheme = getResolvedTheme();
+  document.documentElement.dataset.theme = resolvedTheme;
+  themeToggle.setAttribute("aria-pressed", String(resolvedTheme === "light"));
+  themeToggle.setAttribute(
+    "aria-label",
+    `Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`
+  );
 }
 
 function setInteractiveState(value) {
@@ -618,6 +640,17 @@ terminalLauncher.addEventListener("click", openTerminal);
 closeButton.addEventListener("click", closeTerminal);
 minimizeButton.addEventListener("click", minimizeTerminal);
 maximizeButton.addEventListener("click", toggleMaximize);
+themeToggle.addEventListener("click", () => {
+  const resolvedTheme = getResolvedTheme();
+  themePreference = resolvedTheme === "dark" ? "light" : "dark";
+  window.localStorage.setItem(themeStorageKey, themePreference);
+  applyTheme();
+});
+systemThemeQuery.addEventListener("change", () => {
+  if (!themePreference) {
+    applyTheme();
+  }
+});
 
 terminalInput.addEventListener("input", syncCurrentLine);
 
@@ -636,6 +669,7 @@ terminalInput.addEventListener("keydown", (event) => {
   syncCurrentLine();
 });
 
+applyTheme();
 syncWindowState();
 syncPrompt();
 resetTerminalState({ shouldBootSequence: true });
