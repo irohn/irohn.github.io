@@ -54,6 +54,14 @@ const commands = {
       return { type: "clear" };
     },
   },
+  exit: {
+    description: "Close the terminal window.",
+    example: "exit",
+    builtin: true,
+    run() {
+      return { type: "close" };
+    },
+  },
   help: {
     description: "List available commands.",
     example: "help",
@@ -537,7 +545,7 @@ function submitCommand(rawValue) {
   const promptText = getPromptText();
   const result = runCommand(rawValue);
 
-  if (result.type !== "clear") {
+  if (result.type !== "clear" && result.type !== "close") {
     addPromptLine(rawValue, promptText);
   }
 
@@ -550,6 +558,11 @@ function submitCommand(rawValue) {
 function handleCommandResult(result) {
   if (result.type === "clear") {
     clearHistory();
+    return;
+  }
+
+  if (result.type === "close") {
+    closeTerminal();
     return;
   }
 
