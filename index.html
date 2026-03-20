@@ -1,151 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Arcade</title>
-    <style>
-        :root {
-            --bg-color: #f0f2f5;
-            --card-bg: #fff;
-            --text-color: #333;
-            --hover-shadow: rgba(0,0,0,0.15);
-            --primary-color: #4a90e2;
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A minimal shell-like website with terminal-inspired typing."
+    />
+    <title>Shell</title>
+    <link rel="stylesheet" href="assets/styles/main.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section
+        class="terminal"
+        aria-label="Interactive terminal mockup"
+        tabindex="0"
+      >
+        <div class="terminal__chrome" aria-hidden="true">
+          <span class="terminal__dot terminal__dot--close"></span>
+          <span class="terminal__dot terminal__dot--minimize"></span>
+          <span class="terminal__dot terminal__dot--maximize"></span>
+        </div>
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #1a1a1a;
-                --card-bg: #2d2d2d;
-                --text-color: #e0e0e0;
-                --hover-shadow: rgba(0,0,0,0.4);
-                --primary-color: #64b5f6;
-            }
-        }
+        <div class="terminal__body">
+          <p class="terminal__line terminal__line--muted">
+            For more information type `help`.
+          </p>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+          <div id="terminal-history" class="terminal__history"></div>
 
-        header {
-            margin-bottom: 3rem;
-            text-align: center;
-        }
+          <label class="terminal__prompt-row" for="terminal-input">
+            <span class="terminal__prompt" aria-hidden="true">guest@site:~$</span>
+            <span id="terminal-text" class="terminal__text"></span>
+            <span class="terminal__cursor" aria-hidden="true"></span>
+          </label>
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        p {
-            opacity: 0.8;
-        }
-
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 2rem;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        .game-card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            height: 200px;
-        }
-
-        .game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px var(--hover-shadow);
-        }
-
-        .card-image {
-            height: 120px;
-            background-color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-            font-weight: bold;
-        }
-
-        .card-content {
-            padding: 1rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-bottom: 0.25rem;
-        }
-
-        .card-desc {
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1>Arcade</h1>
-        <p>Select a game to play</p>
-    </header>
-
-    <main class="game-grid">
-        <!-- Omok Game Card -->
-        <a href="omok-game/index.html" class="game-card">
-            <div class="card-image">
-                <span>⚪⚫</span>
-            </div>
-            <div class="card-content">
-                <div class="card-title">Omok</div>
-                <div class="card-desc">Classic 5-in-a-row strategy game.</div>
-            </div>
-        </a>
-
-        <!-- Tetris Game Card -->
-        <a href="tetris-game/index.html" class="game-card">
-            <div class="card-image" style="background-color: #9c27b0;">
-                <span>🧱</span>
-            </div>
-            <div class="card-content">
-                <div class="card-title">Tetris</div>
-                <div class="card-desc">The addictive puzzle game.</div>
-            </div>
-        </a>
-        
-        <!-- Placeholder for future games -->
-        <!-- 
-        <a href="#" class="game-card" style="opacity: 0.5; pointer-events: none;">
-            <div class="card-image" style="background-color: #888;">?</div>
-            <div class="card-content">
-                <div class="card-title">Coming Soon</div>
-            </div>
-        </a> 
-        -->
+          <textarea
+            id="terminal-input"
+            class="terminal__input"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="Terminal input"
+          ></textarea>
+        </div>
+      </section>
     </main>
 
-</body>
+    <script src="assets/scripts/main.js"></script>
+  </body>
 </html>
