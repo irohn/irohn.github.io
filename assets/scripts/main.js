@@ -10,7 +10,7 @@ const closeButton = document.querySelector("#terminal-close");
 const minimizeButton = document.querySelector("#terminal-minimize");
 const maximizeButton = document.querySelector("#terminal-maximize");
 
-const siteName = "site";
+const siteName = "irohn.net";
 const homeDirectory = "/home/guest";
 const unknownCommandMessage =
   "Command not found. Type `help` to see available commands.";
