@@ -15,6 +15,7 @@ const urlPattern = /(https?:\/\/[^\s]+)/g;
 const maxHistoryLines = 1000;
 
 let currentDirectory = homeDirectory;
+let isPinnedToBottom = true;
 
 const fileSystem = createDirectory({
   home: createDirectory({
@@ -229,8 +230,14 @@ function syncPrompt() {
   });
 }
 
+function scrollToBottom() {
+  terminalBody.scrollTop = terminalBody.scrollHeight;
+}
+
 function syncCurrentLine() {
+  isPinnedToBottom = true;
   terminalText.textContent = terminalInput.value;
+  scrollToBottom();
 }
 
 function basename(path) {
@@ -349,6 +356,7 @@ function addOutputLines(lines) {
 
 function clearHistory() {
   terminalHistory.replaceChildren();
+  isPinnedToBottom = true;
 }
 
 function getHistoryLineCount() {
@@ -368,7 +376,10 @@ function trimHistory() {
 
 function commitHistory() {
   trimHistory();
-  terminalBody.scrollTop = terminalBody.scrollHeight;
+
+  if (isPinnedToBottom) {
+    scrollToBottom();
+  }
 }
 
 function parseCommand(rawValue) {
