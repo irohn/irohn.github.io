@@ -18,10 +18,15 @@ const permissionDeniedMessage =
   "User `guest` has no permissions to manipulate the filesystem";
 const urlPattern = /(https?:\/\/[^\s]+)/g;
 const maxHistoryLines = 1000;
+const bootCommand = "whoami";
+const bootDurationMs = 1000;
 
 let currentDirectory = homeDirectory;
 let isPinnedToBottom = true;
 let isMaximized = false;
+let isInteractive = false;
+let needsBootSequence = true;
+let bootSequenceToken = 0;
 
 const fileSystem = createDirectory({
   home: createDirectory({
@@ -248,6 +253,10 @@ function scrollToBottom() {
   terminalBody.scrollTop = terminalBody.scrollHeight;
 }
 
+function setInteractiveState(value) {
+  isInteractive = value;
+}
+
 function syncWindowState() {
   terminal.classList.toggle("terminal--maximized", isMaximized);
 }
@@ -258,6 +267,10 @@ function openTerminal() {
   syncWindowState();
   focusInput();
   scrollToBottom();
+
+  if (needsBootSequence) {
+    runBootSequence();
+  }
 }
 
 function minimizeTerminal() {
@@ -265,10 +278,13 @@ function minimizeTerminal() {
   terminalLauncher.hidden = false;
 }
 
-function resetTerminalState() {
+function resetTerminalState({ shouldBootSequence = false } = {}) {
   currentDirectory = homeDirectory;
   isPinnedToBottom = true;
   isMaximized = false;
+  needsBootSequence = shouldBootSequence;
+  bootSequenceToken += 1;
+  setInteractiveState(!shouldBootSequence);
   terminalHistory.replaceChildren();
   terminalInput.value = "";
   terminalText.textContent = "";
@@ -290,9 +306,19 @@ function toggleMaximize() {
 }
 
 function syncCurrentLine() {
+  if (!isInteractive) {
+    return;
+  }
+
   isPinnedToBottom = true;
   terminalText.textContent = terminalInput.value;
   scrollToBottom();
+}
+
+function sleep(duration) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, duration);
+  });
 }
 
 function basename(path) {
@@ -507,6 +533,20 @@ function runCommand(rawValue) {
   return command.run(args, rawValue);
 }
 
+function submitCommand(rawValue) {
+  const promptText = getPromptText();
+  const result = runCommand(rawValue);
+
+  if (result.type !== "clear") {
+    addPromptLine(rawValue, promptText);
+  }
+
+  handleCommandResult(result);
+  commitHistory();
+  terminalInput.value = "";
+  terminalText.textContent = "";
+}
+
 function handleCommandResult(result) {
   if (result.type === "clear") {
     clearHistory();
@@ -520,6 +560,42 @@ function focusInput() {
   terminalInput.focus({ preventScroll: true });
 }
 
+async function runBootSequence() {
+  const sequenceToken = ++bootSequenceToken;
+  needsBootSequence = false;
+  setInteractiveState(false);
+  terminalInput.value = "";
+  terminalText.textContent = "";
+  focusInput();
+
+  const stepDuration = bootDurationMs / bootCommand.length;
+
+  for (const character of bootCommand) {
+    if (sequenceToken !== bootSequenceToken || terminal.hidden) {
+      return;
+    }
+
+    terminalInput.value += character;
+    terminalText.textContent = terminalInput.value;
+    scrollToBottom();
+    await sleep(stepDuration);
+  }
+
+  if (sequenceToken !== bootSequenceToken || terminal.hidden) {
+    return;
+  }
+
+  await sleep(120);
+
+  if (sequenceToken !== bootSequenceToken || terminal.hidden) {
+    return;
+  }
+
+  submitCommand(bootCommand);
+  setInteractiveState(true);
+  focusInput();
+}
+
 terminal.addEventListener("click", focusInput);
 terminal.addEventListener("focus", focusInput);
 terminalLauncher.addEventListener("click", openTerminal);
@@ -530,26 +606,21 @@ maximizeButton.addEventListener("click", toggleMaximize);
 terminalInput.addEventListener("input", syncCurrentLine);
 
 terminalInput.addEventListener("keydown", (event) => {
+  if (!isInteractive) {
+    event.preventDefault();
+    return;
+  }
+
   if (event.key !== "Enter") {
     return;
   }
 
   event.preventDefault();
-  const inputValue = terminalInput.value;
-  const promptText = getPromptText();
-  const result = runCommand(inputValue);
-
-  if (result.type !== "clear") {
-    addPromptLine(inputValue, promptText);
-  }
-
-  handleCommandResult(result);
-  commitHistory();
-  terminalInput.value = "";
+  submitCommand(terminalInput.value);
   syncCurrentLine();
 });
 
 syncWindowState();
 syncPrompt();
-focusInput();
-syncCurrentLine();
+resetTerminalState({ shouldBootSequence: true });
+openTerminal();
