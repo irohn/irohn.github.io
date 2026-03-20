@@ -3,7 +3,12 @@ const terminalBody = document.querySelector(".terminal__body");
 const terminalInput = document.querySelector("#terminal-input");
 const terminalText = document.querySelector("#terminal-text");
 const terminalHistory = document.querySelector("#terminal-history");
+const introLine = document.querySelector(".terminal__line--muted");
 const promptElements = document.querySelectorAll(".terminal__prompt");
+const terminalLauncher = document.querySelector("#terminal-launcher");
+const closeButton = document.querySelector("#terminal-close");
+const minimizeButton = document.querySelector("#terminal-minimize");
+const maximizeButton = document.querySelector("#terminal-maximize");
 
 const siteName = "site";
 const homeDirectory = "/home/guest";
@@ -16,6 +21,7 @@ const maxHistoryLines = 1000;
 
 let currentDirectory = homeDirectory;
 let isPinnedToBottom = true;
+let isMaximized = false;
 
 const fileSystem = createDirectory({
   home: createDirectory({
@@ -240,6 +246,47 @@ function syncPrompt() {
 
 function scrollToBottom() {
   terminalBody.scrollTop = terminalBody.scrollHeight;
+}
+
+function syncWindowState() {
+  terminal.classList.toggle("terminal--maximized", isMaximized);
+}
+
+function openTerminal() {
+  terminal.hidden = false;
+  terminalLauncher.hidden = true;
+  syncWindowState();
+  focusInput();
+  scrollToBottom();
+}
+
+function minimizeTerminal() {
+  terminal.hidden = true;
+  terminalLauncher.hidden = false;
+}
+
+function resetTerminalState() {
+  currentDirectory = homeDirectory;
+  isPinnedToBottom = true;
+  isMaximized = false;
+  terminalHistory.replaceChildren();
+  terminalInput.value = "";
+  terminalText.textContent = "";
+  introLine.hidden = false;
+  syncPrompt();
+  syncWindowState();
+}
+
+function closeTerminal() {
+  resetTerminalState();
+  minimizeTerminal();
+}
+
+function toggleMaximize() {
+  isMaximized = !isMaximized;
+  syncWindowState();
+  focusInput();
+  scrollToBottom();
 }
 
 function syncCurrentLine() {
@@ -475,6 +522,10 @@ function focusInput() {
 
 terminal.addEventListener("click", focusInput);
 terminal.addEventListener("focus", focusInput);
+terminalLauncher.addEventListener("click", openTerminal);
+closeButton.addEventListener("click", closeTerminal);
+minimizeButton.addEventListener("click", minimizeTerminal);
+maximizeButton.addEventListener("click", toggleMaximize);
 
 terminalInput.addEventListener("input", syncCurrentLine);
 
@@ -498,6 +549,7 @@ terminalInput.addEventListener("keydown", (event) => {
   syncCurrentLine();
 });
 
+syncWindowState();
 syncPrompt();
 focusInput();
 syncCurrentLine();

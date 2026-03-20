@@ -42,6 +42,42 @@ body {
   place-items: center;
 }
 
+.terminal-launcher {
+  position: fixed;
+  left: 2rem;
+  bottom: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--terminal-border);
+  border-radius: 14px;
+  background: rgba(12, 12, 12, 0.92);
+  color: var(--text-primary);
+  font: inherit;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+.terminal-launcher[hidden] {
+  display: none;
+}
+
+.terminal-launcher__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-prompt);
+}
+
+.terminal-launcher__label {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
 .terminal {
   width: min(100%, 960px);
   height: clamp(32rem, 70vh, 52rem);
@@ -54,6 +90,16 @@ body {
   border-radius: 18px;
   box-shadow: 0 24px 80px var(--terminal-shadow);
   overflow: hidden;
+}
+
+.terminal[hidden] {
+  display: none;
+}
+
+.terminal--maximized {
+  width: min(100%, 1180px);
+  height: calc(100vh - 2rem);
+  max-height: calc(100vh - 2rem);
 }
 
 .terminal:focus-visible {
@@ -72,7 +118,10 @@ body {
 .terminal__dot {
   width: 0.75rem;
   height: 0.75rem;
+  padding: 0;
+  border: 0;
   border-radius: 999px;
+  cursor: pointer;
 }
 
 .terminal__dot--close {
@@ -97,6 +146,10 @@ body {
   gap: 0.75rem;
   overflow-y: auto;
   scrollbar-gutter: stable;
+}
+
+.terminal--maximized .terminal__body {
+  padding: 0.75rem;
 }
 
 .terminal__history {
@@ -201,10 +254,19 @@ body {
     padding: 1rem;
   }
 
+  .terminal-launcher {
+    left: 1rem;
+    bottom: 1rem;
+  }
+
   .terminal {
     height: calc(100vh - 2rem);
     max-height: calc(100vh - 2rem);
     border-radius: 14px;
+  }
+
+  .terminal--maximized {
+    width: 100%;
   }
 
   .terminal__body {
