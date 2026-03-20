@@ -1,10 +1,12 @@
 const terminal = document.querySelector(".terminal");
+const pageShell = document.querySelector(".page-shell");
 const terminalBody = document.querySelector(".terminal__body");
 const terminalInput = document.querySelector("#terminal-input");
 const terminalText = document.querySelector("#terminal-text");
 const terminalHistory = document.querySelector("#terminal-history");
 const introLine = document.querySelector(".terminal__line--muted");
 const promptElements = document.querySelectorAll(".terminal__prompt");
+const desktopDock = document.querySelector("#desktop-dock");
 const terminalLauncher = document.querySelector("#terminal-launcher");
 const closeButton = document.querySelector("#terminal-close");
 const minimizeButton = document.querySelector("#terminal-minimize");
@@ -267,11 +269,12 @@ function setInteractiveState(value) {
 
 function syncWindowState() {
   terminal.classList.toggle("terminal--maximized", isMaximized);
+  pageShell.classList.toggle("page-shell--maximized", isMaximized);
 }
 
 function openTerminal() {
   terminal.hidden = false;
-  terminalLauncher.hidden = true;
+  desktopDock.hidden = true;
   syncWindowState();
   focusInput();
   scrollToBottom();
@@ -283,7 +286,7 @@ function openTerminal() {
 
 function minimizeTerminal() {
   terminal.hidden = true;
-  terminalLauncher.hidden = false;
+  desktopDock.hidden = false;
 }
 
 function resetTerminalState({ shouldBootSequence = false } = {}) {
