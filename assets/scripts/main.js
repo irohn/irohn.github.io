@@ -1,4 +1,5 @@
 const terminal = document.querySelector(".terminal");
+const terminalBody = document.querySelector(".terminal__body");
 const terminalInput = document.querySelector("#terminal-input");
 const terminalText = document.querySelector("#terminal-text");
 const terminalHistory = document.querySelector("#terminal-history");
@@ -11,6 +12,7 @@ const unknownCommandMessage =
 const permissionDeniedMessage =
   "User `guest` has no permissions to manipulate the filesystem";
 const urlPattern = /(https?:\/\/[^\s]+)/g;
+const maxHistoryLines = 1000;
 
 let currentDirectory = homeDirectory;
 
@@ -319,6 +321,7 @@ function createLineElement(value, className = "terminal__line") {
 function addPromptLine(value, promptText) {
   const historyLine = document.createElement("p");
   historyLine.className = "terminal__line";
+  historyLine.dataset.lineCount = "1";
 
   const prompt = document.createElement("span");
   prompt.className = "terminal__prompt";
@@ -335,6 +338,7 @@ function addOutputLines(lines) {
 
   const outputGroup = document.createElement("div");
   outputGroup.className = "terminal__output";
+  outputGroup.dataset.lineCount = String(lines.length);
 
   lines.forEach((line) => {
     outputGroup.append(createLineElement(line));
@@ -347,8 +351,24 @@ function clearHistory() {
   terminalHistory.replaceChildren();
 }
 
+function getHistoryLineCount() {
+  return Array.from(terminalHistory.children).reduce((total, child) => {
+    return total + Number(child.dataset.lineCount ?? 0);
+  }, 0);
+}
+
+function trimHistory() {
+  let totalLines = getHistoryLineCount();
+
+  while (totalLines > maxHistoryLines && terminalHistory.firstElementChild) {
+    totalLines -= Number(terminalHistory.firstElementChild.dataset.lineCount ?? 0);
+    terminalHistory.firstElementChild.remove();
+  }
+}
+
 function commitHistory() {
-  terminalHistory.scrollTop = terminalHistory.scrollHeight;
+  trimHistory();
+  terminalBody.scrollTop = terminalBody.scrollHeight;
 }
 
 function parseCommand(rawValue) {
