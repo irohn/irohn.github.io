@@ -24,14 +24,26 @@ const siteName = "irohn.net";
 const homeDirectory = "/home/guest";
 const browserHomePage = "links.html";
 const unknownCommandMessage =
-  "Command not found. Type `help` to see available commands.";
+  "Command not found. Type `help commands` to see available commands.";
 const permissionDeniedMessage =
-  "User `guest` has no permissions to manipulate the filesystem";
+  "Error: Permission denied for user: guest";
 const urlPattern = /(https?:\/\/[^\s]+)/g;
 const maxHistoryLines = 1000;
 const bootCommand = "whoami";
 const bootDurationMs = 1000;
 const themeStorageKey = "irohn-theme-preference";
+const aliases = {
+  www: "cd /srv/irohn.net",
+};
+const bashrcContent = `# ~/.bashrc: executed by bash(1)
+
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# History size
+HISTSIZE=1000
+
+alias www="cd /srv/irohn.net"`;
 
 let currentDirectory = homeDirectory;
 let isPinnedToBottom = true;
@@ -49,17 +61,33 @@ let browserNavigationToken = 0;
 const fileSystem = createDirectory({
   home: createDirectory({
     guest: createDirectory({
-      "HELP.md": createFile(() => buildHelpLines().join("\n")),
+      ".bashrc": createFile(bashrcContent),
+      Documents: createDirectory({}),
+      Downloads: createDirectory({}),
+      Games: createDirectory({}),
     }),
-    irohn: createDirectory({}),
+  }),
+  srv: createDirectory({
+    "irohn.net": createDirectory({
+      "CNAME": createFile("irohn.net"),
+      "README.md": createFile("Personal website repository"),
+      "index.html": createFile("Static site entrypoint"),
+      "links.html": createFile("Browser home page with social links"),
+      assets: createDirectory({
+        styles: createDirectory({
+          "main.css": createFile("Main site stylesheet"),
+        }),
+        scripts: createDirectory({
+          "main.js": createFile("Main site behavior"),
+        }),
+      }),
+    }),
   }),
   bin: createDirectory({
-    pwd: createFile("binary"),
     cd: createFile("binary"),
     ls: createFile("binary"),
     mkdir: createFile("binary"),
     cat: createFile("binary"),
-    which: createFile("binary"),
   }),
 });
 
@@ -111,14 +139,14 @@ const commands = {
   pwd: {
     description: "Print the current working directory.",
     example: "pwd",
-    path: "/bin/pwd",
+    builtin: true,
     run() {
       return output([currentDirectory]);
     },
   },
   cd: {
     description: "Change the current working directory.",
-    example: "cd /home/irohn",
+    example: "cd /srv/irohn.net",
     path: "/bin/cd",
     run(args) {
       const targetPath = args[0] ?? homeDirectory;
@@ -168,7 +196,7 @@ const commands = {
   },
   cat: {
     description: "Print file contents.",
-    example: "cat /home/guest/HELP.md",
+    example: "cat /home/guest/.bashrc",
     path: "/bin/cat",
     run(args) {
       if (!args.length) {
@@ -192,13 +220,19 @@ const commands = {
   which: {
     description: "Show where a command is located.",
     example: "which ls",
-    path: "/bin/which",
+    builtin: true,
     run(args) {
       if (!args.length) {
         return output(["which: missing command operand"]);
       }
 
       const target = args[0];
+      const aliasCommand = aliases[target];
+
+      if (aliasCommand) {
+        return output([`${target}: aliased to ${aliasCommand}`]);
+      }
+
       const command = resolveCommand(target);
 
       if (!command) {
@@ -210,7 +244,7 @@ const commands = {
       }
 
       if (command.builtin) {
-        return output([`${target}: shell built-in`]);
+        return output([`${target}: shell built-in command`]);
       }
 
       return output([`${target} not found`]);
@@ -845,6 +879,13 @@ function runCommand(rawValue) {
 
   if (!name) {
     return output([]);
+  }
+
+  const aliasCommand = aliases[name];
+
+  if (aliasCommand) {
+    const expandedCommand = [aliasCommand, ...args].filter(Boolean).join(" ");
+    return runCommand(expandedCommand);
   }
 
   const command = resolveCommand(name);
