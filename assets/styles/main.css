@@ -191,10 +191,21 @@ body {
 .terminal__dot {
   width: 0.75rem;
   height: 0.75rem;
+  display: inline-grid;
+  place-items: center;
   padding: 0;
   border: 0;
   border-radius: 999px;
   cursor: pointer;
+}
+
+.terminal__dot-icon {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 0.45rem;
+  font-weight: 700;
+  line-height: 1;
+  transform: translateY(-0.01rem);
+  pointer-events: none;
 }
 
 .terminal__dot--close {

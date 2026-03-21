@@ -308,6 +308,7 @@ function syncWindowState() {
   terminal.classList.toggle("terminal--maximized", isMaximized);
   pageShell.classList.toggle("page-shell--maximized", isMaximized);
   desktopDock.hidden = isMaximized;
+  themeToggle.hidden = isMaximized;
 }
 
 function openTerminal() {
