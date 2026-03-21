@@ -24,7 +24,6 @@ const maxHistoryLines = 1000;
 const bootCommand = "whoami";
 const bootDurationMs = 1000;
 const themeStorageKey = "irohn-theme-preference";
-const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
 let currentDirectory = homeDirectory;
 let isPinnedToBottom = true;
@@ -32,7 +31,7 @@ let isMaximized = false;
 let isInteractive = false;
 let needsBootSequence = true;
 let bootSequenceToken = 0;
-let themePreference = window.localStorage.getItem(themeStorageKey);
+let themePreference = window.localStorage.getItem(themeStorageKey) ?? "dark";
 
 const fileSystem = createDirectory({
   home: createDirectory({
@@ -288,11 +287,7 @@ function scrollToBottom() {
 }
 
 function getResolvedTheme() {
-  if (themePreference === "light" || themePreference === "dark") {
-    return themePreference;
-  }
-
-  return systemThemeQuery.matches ? "dark" : "light";
+  return themePreference === "light" ? "light" : "dark";
 }
 
 function applyTheme() {
@@ -665,11 +660,6 @@ themeToggle.addEventListener("click", () => {
   themePreference = resolvedTheme === "dark" ? "light" : "dark";
   window.localStorage.setItem(themeStorageKey, themePreference);
   applyTheme();
-});
-systemThemeQuery.addEventListener("change", () => {
-  if (!themePreference) {
-    applyTheme();
-  }
 });
 
 terminalInput.addEventListener("input", syncCurrentLine);
