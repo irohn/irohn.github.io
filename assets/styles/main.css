@@ -197,6 +197,9 @@ body {
   border: 0;
   border-radius: 999px;
   cursor: pointer;
+  transition:
+    filter 140ms ease,
+    transform 140ms ease;
 }
 
 .terminal__dot-icon {
@@ -204,8 +207,24 @@ body {
   font-size: 0.45rem;
   font-weight: 700;
   line-height: 1;
+  opacity: 0;
   transform: translateY(-0.01rem);
   pointer-events: none;
+  transition: opacity 140ms ease;
+}
+
+.terminal__dot:hover,
+.terminal__dot:focus-visible {
+  filter: brightness(0.92) saturate(1.08);
+}
+
+.terminal__dot:active {
+  transform: scale(0.96);
+}
+
+.terminal__dot:hover .terminal__dot-icon,
+.terminal__dot:focus-visible .terminal__dot-icon {
+  opacity: 1;
 }
 
 .terminal__dot--close {
