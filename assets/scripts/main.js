@@ -102,9 +102,9 @@ const commands = {
     builtin: true,
     run() {
       return output([
-        "My name is Ori.",
-        "I am a software developer.",
-        "Look at my projects at https://github.com/irohn",
+        "My name is Ori,",
+        "I mostly do Software Development, Devops Engineering & Automations.",
+        "Feel free to explore here to find out more.",
       ]);
     },
   },
