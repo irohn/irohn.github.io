@@ -134,11 +134,13 @@ body {
   color: var(--text-prompt);
 }
 
-.desktop-app__icon--github {
+.desktop-app__icon--github,
+.desktop-app__icon--linkedin {
   color: var(--desktop-app-github);
 }
 
-.desktop-app__icon--github svg {
+.desktop-app__icon--github svg,
+.desktop-app__icon--linkedin svg {
   width: 1.4rem;
   height: 1.4rem;
   fill: currentColor;
