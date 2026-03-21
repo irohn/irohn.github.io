@@ -11,15 +11,45 @@
     <style>
       :root {
         color-scheme: dark;
+        --links-background:
+          radial-gradient(circle at top, rgba(127, 227, 106, 0.12), transparent 28%),
+          #0f1110;
+        --links-text: #eef2ea;
+        --links-card: rgba(18, 20, 18, 0.92);
+        --links-border: rgba(255, 255, 255, 0.08);
+        --links-shadow: rgba(0, 0, 0, 0.28);
+        --links-icon-background: rgba(255, 255, 255, 0.04);
+        --links-icon-color: #f8faf7;
+        --links-heading-muted: #9aa19a;
+        --links-anchor: #eef2ea;
+        --links-anchor-hover: #7fe36a;
+        --links-description: #9aa19a;
+        --links-kicker: #7a7a7a;
+      }
+
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --links-background:
+          radial-gradient(circle at top, rgba(47, 138, 57, 0.12), transparent 28%),
+          #eef1f5;
+        --links-text: #18212f;
+        --links-card: rgba(248, 249, 251, 0.95);
+        --links-border: rgba(15, 23, 42, 0.08);
+        --links-shadow: rgba(15, 23, 42, 0.12);
+        --links-icon-background: rgba(15, 23, 42, 0.05);
+        --links-icon-color: #202938;
+        --links-heading-muted: #657285;
+        --links-anchor: #18212f;
+        --links-anchor-hover: #2f8a39;
+        --links-description: #657285;
+        --links-kicker: #657285;
       }
 
       body {
         min-height: 100vh;
         margin: 0;
-        background:
-          radial-gradient(circle at top, rgba(127, 227, 106, 0.12), transparent 28%),
-          #0f1110;
-        color: #eef2ea;
+        background: var(--links-background);
+        color: var(--links-text);
       }
 
       .links-shell {
@@ -27,10 +57,10 @@
       }
 
       .links-card {
-        background: rgba(18, 20, 18, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: var(--links-card);
+        border: 1px solid var(--links-border);
         border-radius: 1rem;
-        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+        box-shadow: 0 18px 48px var(--links-shadow);
       }
 
       .links-title {
@@ -40,7 +70,7 @@
       .links-list .list-group-item {
         background: transparent;
         color: inherit;
-        border-color: rgba(255, 255, 255, 0.08);
+        border-color: var(--links-border);
       }
 
       .links-icon {
@@ -49,8 +79,8 @@
         display: inline-grid;
         place-items: center;
         border-radius: 0.85rem;
-        background: rgba(255, 255, 255, 0.04);
-        color: #f8faf7;
+        background: var(--links-icon-background);
+        color: var(--links-icon-color);
         flex-shrink: 0;
       }
 
@@ -60,16 +90,21 @@
       }
 
       .links-anchor {
-        color: #eef2ea;
+        color: var(--links-anchor);
         text-decoration: none;
       }
 
       .links-anchor:hover {
-        color: #7fe36a;
+        color: var(--links-anchor-hover);
       }
 
       .links-description {
-        color: #9aa19a;
+        color: var(--links-description);
+      }
+
+      .links-kicker,
+      .links-subtitle {
+        color: var(--links-kicker) !important;
       }
     </style>
   </head>
@@ -77,8 +112,9 @@
     <main class="container py-5">
       <section class="links-shell mx-auto">
         <div class="links-card p-4 p-md-5">
-          <p class="text-uppercase small text-secondary mb-2">HOME</p>
+          <p class="text-uppercase small links-kicker mb-2">HOME</p>
           <h1 class="links-title h3 mb-2">My links</h1>
+          <p class="small links-subtitle mb-4">Quick links opened from the dock browser.</p>
 
           <div class="list-group list-group-flush links-list">
             <a
@@ -146,5 +182,49 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const themeStorageKey = "irohn-theme-preference";
+
+      function applyTheme(theme) {
+        const resolvedTheme = theme === "light" ? "light" : "dark";
+        document.documentElement.dataset.theme = resolvedTheme;
+      }
+
+      function syncThemeFromParent() {
+        try {
+          const parentTheme =
+            window.parent?.document?.documentElement?.dataset?.theme ||
+            window.localStorage.getItem(themeStorageKey) ||
+            "dark";
+          applyTheme(parentTheme);
+        } catch (_error) {
+          applyTheme(window.localStorage.getItem(themeStorageKey) || "dark");
+        }
+      }
+
+      syncThemeFromParent();
+      window.addEventListener("storage", (event) => {
+        if (event.key === themeStorageKey) {
+          applyTheme(event.newValue || "dark");
+        }
+      });
+
+      try {
+        const parentRoot = window.parent?.document?.documentElement;
+
+        if (parentRoot) {
+          const observer = new MutationObserver(() => {
+            syncThemeFromParent();
+          });
+
+          observer.observe(parentRoot, {
+            attributes: true,
+            attributeFilter: ["data-theme"],
+          });
+        }
+      } catch (_error) {
+        // Cross-origin access is not expected here, but ignore if it happens.
+      }
+    </script>
   </body>
 </html>
