@@ -244,7 +244,6 @@ function buildHelpOverviewLines() {
     "This is an emulated terminal running inside the website.",
     "Type `help commands` to see the available shell commands.",
     "You can minimize, maximize, or close the terminal with the window controls.",
-    "When the terminal is minimized or closed, you can use other apps from the dock.",
   ];
 }
 
