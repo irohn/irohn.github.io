@@ -307,11 +307,11 @@ function setInteractiveState(value) {
 function syncWindowState() {
   terminal.classList.toggle("terminal--maximized", isMaximized);
   pageShell.classList.toggle("page-shell--maximized", isMaximized);
+  desktopDock.hidden = isMaximized;
 }
 
 function openTerminal() {
   terminal.hidden = false;
-  desktopDock.hidden = true;
   syncWindowState();
   focusInput();
   scrollToBottom();
@@ -323,7 +323,7 @@ function openTerminal() {
 
 function minimizeTerminal() {
   terminal.hidden = true;
-  desktopDock.hidden = false;
+  syncWindowState();
 }
 
 function resetTerminalState({ shouldBootSequence = false } = {}) {
