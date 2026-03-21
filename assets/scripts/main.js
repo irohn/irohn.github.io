@@ -32,6 +32,8 @@ let isInteractive = false;
 let needsBootSequence = true;
 let bootSequenceToken = 0;
 let themePreference = window.localStorage.getItem(themeStorageKey) ?? "dark";
+let terminalWindowState = "closed";
+let isTerminalActive = false;
 
 const fileSystem = createDirectory({
   home: createDirectory({
@@ -263,21 +265,46 @@ function buildCommandHelpLines() {
   });
 }
 
-function getPromptText() {
-  const displayPath = currentDirectory.startsWith(`${homeDirectory}/`)
+function getPromptParts() {
+  const path = currentDirectory.startsWith(`${homeDirectory}/`)
     ? currentDirectory.replace(homeDirectory, "~")
     : currentDirectory === homeDirectory
       ? "~"
       : currentDirectory;
 
-  return `guest@${siteName}:${displayPath}$`;
+  return {
+    userHost: `guest@${siteName}`,
+    separator: ":",
+    path,
+    sigil: "$",
+  };
+}
+
+function createPromptElement() {
+  const prompt = document.createElement("span");
+  prompt.className = "terminal__prompt";
+
+  const { userHost, separator, path, sigil } = getPromptParts();
+  const segments = [
+    ["terminal__prompt-userhost", userHost],
+    ["terminal__prompt-separator", separator],
+    ["terminal__prompt-path", path],
+    ["terminal__prompt-sigil", sigil],
+  ];
+
+  segments.forEach(([className, value]) => {
+    const segment = document.createElement("span");
+    segment.className = className;
+    segment.textContent = value;
+    prompt.append(segment);
+  });
+
+  return prompt;
 }
 
 function syncPrompt() {
-  const promptText = getPromptText();
-
   promptElements.forEach((promptElement) => {
-    promptElement.textContent = promptText;
+    promptElement.replaceChildren(...createPromptElement().childNodes);
   });
 }
 
@@ -303,14 +330,36 @@ function setInteractiveState(value) {
   isInteractive = value;
 }
 
+function setTerminalActive(value) {
+  isTerminalActive = value;
+  syncWindowState();
+}
+
+function isTerminalFocused() {
+  return terminalWindowState === "open" && isTerminalActive && document.hasFocus();
+}
+
 function syncWindowState() {
+  const terminalFocused = isTerminalFocused();
+
   terminal.classList.toggle("terminal--maximized", isMaximized);
+  terminal.classList.toggle("terminal--focused", terminalFocused);
+  terminal.classList.toggle("terminal--inactive", !terminalFocused);
   pageShell.classList.toggle("page-shell--maximized", isMaximized);
   desktopDock.hidden = isMaximized;
   themeToggle.hidden = isMaximized;
+  terminalLauncher.dataset.windowState = terminalFocused
+    ? "focused"
+    : terminalWindowState === "open"
+      ? "inactive"
+    : terminalWindowState === "minimized"
+      ? "minimized"
+      : "closed";
 }
 
 function openTerminal() {
+  terminalWindowState = "open";
+  isTerminalActive = true;
   terminal.hidden = false;
   syncWindowState();
   focusInput();
@@ -322,6 +371,8 @@ function openTerminal() {
 }
 
 function minimizeTerminal() {
+  terminalWindowState = "minimized";
+  isTerminalActive = false;
   terminal.hidden = true;
   syncWindowState();
 }
@@ -330,6 +381,7 @@ function resetTerminalState({ shouldBootSequence = false } = {}) {
   currentDirectory = homeDirectory;
   isPinnedToBottom = true;
   isMaximized = false;
+  isTerminalActive = false;
   needsBootSequence = shouldBootSequence;
   bootSequenceToken += 1;
   setInteractiveState(!shouldBootSequence);
@@ -342,8 +394,11 @@ function resetTerminalState({ shouldBootSequence = false } = {}) {
 }
 
 function closeTerminal() {
+  terminalWindowState = "closed";
   resetTerminalState();
   minimizeTerminal();
+  terminalWindowState = "closed";
+  syncWindowState();
 }
 
 function toggleMaximize() {
@@ -500,14 +555,12 @@ function createLineElement(value, className = "terminal__line") {
   return line;
 }
 
-function addPromptLine(value, promptText) {
+function addPromptLine(value) {
   const historyLine = document.createElement("p");
   historyLine.className = "terminal__line";
   historyLine.dataset.lineCount = "1";
 
-  const prompt = document.createElement("span");
-  prompt.className = "terminal__prompt";
-  prompt.textContent = promptText;
+  const prompt = createPromptElement();
 
   historyLine.append(prompt, value);
   terminalHistory.append(historyLine);
@@ -582,11 +635,10 @@ function runCommand(rawValue) {
 }
 
 function submitCommand(rawValue) {
-  const promptText = getPromptText();
   const result = runCommand(rawValue);
 
   if (result.type !== "clear" && result.type !== "close") {
-    addPromptLine(rawValue, promptText);
+    addPromptLine(rawValue);
   }
 
   handleCommandResult(result);
@@ -610,6 +662,11 @@ function handleCommandResult(result) {
 }
 
 function focusInput() {
+  if (terminalWindowState === "open") {
+    isTerminalActive = true;
+    syncWindowState();
+  }
+
   terminalInput.focus({ preventScroll: true });
 }
 
@@ -651,6 +708,33 @@ async function runBootSequence() {
 
 terminal.addEventListener("click", focusInput);
 terminal.addEventListener("focus", focusInput);
+document.addEventListener("pointerdown", (event) => {
+  if (terminalWindowState !== "open") {
+    return;
+  }
+
+  if (terminal.contains(event.target)) {
+    setTerminalActive(true);
+    return;
+  }
+
+  setTerminalActive(false);
+});
+document.addEventListener("focusin", (event) => {
+  if (terminalWindowState !== "open") {
+    return;
+  }
+
+  if (event.target === terminalInput || terminal.contains(event.target)) {
+    setTerminalActive(true);
+    return;
+  }
+
+  setTerminalActive(false);
+});
+window.addEventListener("focus", syncWindowState);
+window.addEventListener("blur", syncWindowState);
+document.addEventListener("visibilitychange", syncWindowState);
 terminalLauncher.addEventListener("click", openTerminal);
 closeButton.addEventListener("click", closeTerminal);
 minimizeButton.addEventListener("click", minimizeTerminal);

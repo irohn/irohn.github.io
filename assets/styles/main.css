@@ -1,11 +1,11 @@
 :root {
-  --page-background: #050505;
-  --terminal-background: #0b0b0b;
+  --page-background: #151515;
+  --terminal-background: #050505;
   --terminal-border: rgba(255, 255, 255, 0.08);
-  --terminal-shadow: rgba(0, 0, 0, 0.45);
+  --terminal-shadow: rgba(0, 0, 0, 0.62);
   --text-primary: #f5f5f5;
   --text-muted: #7a7a7a;
-  --text-prompt: #a3ffb0;
+  --text-prompt: #7fe36a;
   --text-directory: #7fa8c9;
   --text-executable: #8fb59b;
   --text-file: #e7e7e7;
@@ -20,6 +20,8 @@
   --desktop-app-border: rgba(255, 255, 255, 0.04);
   --desktop-app-icon-background: rgba(255, 255, 255, 0.05);
   --desktop-app-github: #d6d6d6;
+  --desktop-app-indicator-active: rgba(255, 255, 255, 0.94);
+  --desktop-app-indicator-inactive: rgba(255, 255, 255, 0.28);
   --font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono",
     Menlo, monospace;
 }
@@ -36,7 +38,7 @@
   --terminal-shadow: rgba(15, 23, 42, 0.12);
   --text-primary: #18212f;
   --text-muted: #657285;
-  --text-prompt: #29784e;
+  --text-prompt: #2f8a39;
   --text-directory: #456c92;
   --text-executable: #4e7b5f;
   --text-file: #202938;
@@ -51,6 +53,8 @@
   --desktop-app-border: rgba(15, 23, 42, 0.06);
   --desktop-app-icon-background: rgba(15, 23, 42, 0.05);
   --desktop-app-github: #202938;
+  --desktop-app-indicator-active: rgba(24, 33, 47, 0.92);
+  --desktop-app-indicator-inactive: rgba(24, 33, 47, 0.28);
 }
 
 *,
@@ -106,6 +110,7 @@ body {
 }
 
 .desktop-app {
+  position: relative;
   width: 3rem;
   height: 3rem;
   display: inline-grid;
@@ -118,6 +123,29 @@ body {
   font: inherit;
   text-decoration: none;
   cursor: pointer;
+}
+
+.desktop-app::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.22rem;
+  width: 1.1rem;
+  height: 2px;
+  border-radius: 999px;
+  opacity: 0;
+  transform: translateX(-50%);
+  background: var(--desktop-app-indicator-inactive);
+}
+
+.desktop-app[data-window-state="inactive"]::after,
+.desktop-app[data-window-state="minimized"]::after,
+.desktop-app[data-window-state="focused"]::after {
+  opacity: 1;
+}
+
+.desktop-app[data-window-state="focused"]::after {
+  background: var(--desktop-app-indicator-active);
 }
 
 .desktop-app__icon {
@@ -155,8 +183,9 @@ body {
     var(--terminal-background);
   border: 1px solid var(--terminal-border);
   border-radius: 18px;
-  box-shadow: 0 24px 80px var(--terminal-shadow);
+  box-shadow: none;
   overflow: hidden;
+  transition: box-shadow 160ms ease;
 }
 
 .terminal[hidden] {
@@ -168,6 +197,10 @@ body {
   height: 100%;
   max-height: none;
   border-radius: 12px;
+}
+
+.terminal--focused {
+  box-shadow: 0 24px 80px var(--terminal-shadow);
 }
 
 .terminal:focus-visible {
@@ -382,7 +415,27 @@ body {
 
 .terminal__prompt {
   margin-right: 0.7rem;
+  display: inline-flex;
+  align-items: baseline;
+  flex-shrink: 0;
+}
+
+.terminal__prompt-userhost {
   color: var(--text-prompt);
+}
+
+.terminal__prompt-separator,
+.terminal__prompt-sigil {
+  color: var(--text-primary);
+}
+
+.terminal__prompt-path {
+  color: var(--text-directory);
+}
+
+.terminal__prompt-separator,
+.terminal__prompt-sigil,
+.terminal__prompt-path {
   flex-shrink: 0;
 }
 
@@ -419,6 +472,11 @@ body {
   background: var(--cursor-color);
   transform: translateY(0.12em);
   animation: blink 1.1s steps(1, end) infinite;
+}
+
+.terminal--inactive .terminal__cursor {
+  animation: none;
+  opacity: 0;
 }
 
 .terminal__input {
