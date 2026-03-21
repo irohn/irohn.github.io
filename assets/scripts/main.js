@@ -69,11 +69,19 @@ const commands = {
     },
   },
   help: {
-    description: "List available commands.",
-    example: "help",
+    description: "Explain the terminal and show help topics.",
+    example: "help commands",
     builtin: true,
-    run() {
-      return output(buildHelpLines());
+    run(args) {
+      if (!args.length) {
+        return output(buildHelpOverviewLines());
+      }
+
+      if (args[0] === "commands") {
+        return output(buildCommandHelpLines());
+      }
+
+      return output([`help: unknown topic: ${args[0]}`, "Try `help commands`."]);
     },
   },
   whoami: {
@@ -84,7 +92,6 @@ const commands = {
       return output([
         "My name is Ori.",
         "I am a software developer.",
-        "I mainly do back-end stuff.",
         "Look at my projects at https://github.com/irohn",
       ]);
     },
@@ -230,6 +237,19 @@ function createEntryToken(value, entryType) {
 }
 
 function buildHelpLines() {
+  return buildHelpOverviewLines();
+}
+
+function buildHelpOverviewLines() {
+  return [
+    "This is an emulated terminal running inside the website.",
+    "Type `help commands` to see the available shell commands.",
+    "You can minimize, maximize, or close the terminal with the window controls.",
+    "When the terminal is minimized or closed, you can use other apps from the dock.",
+  ];
+}
+
+function buildCommandHelpLines() {
   return Object.entries(commands).map(([name, command]) => {
     const parts = [name];
 

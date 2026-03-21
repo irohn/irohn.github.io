@@ -322,7 +322,7 @@ body {
 .terminal__output {
   display: flex;
   flex-direction: column;
-  gap: 0.18rem;
+  gap: 0.02rem;
 }
 
 .terminal__line,
@@ -336,6 +336,10 @@ body {
 
 .terminal__line--muted {
   color: var(--text-muted);
+}
+
+.terminal__output .terminal__line {
+  line-height: 1.4;
 }
 
 .terminal__prompt-row {
