@@ -8,13 +8,26 @@ const introLine = document.querySelector(".terminal__line--muted");
 const promptElements = document.querySelectorAll(".terminal__prompt");
 const desktopDock = document.querySelector("#desktop-dock");
 const terminalLauncher = document.querySelector("#terminal-launcher");
+const githubLauncher = document.querySelector("#github-launcher");
+const linkedinLauncher = document.querySelector("#linkedin-launcher");
 const closeButton = document.querySelector("#terminal-close");
 const minimizeButton = document.querySelector("#terminal-minimize");
 const maximizeButton = document.querySelector("#terminal-maximize");
+const browser = document.querySelector("#browser-window");
+const browserAddress = document.querySelector("#browser-address");
+const browserMessageTitle = document.querySelector("#browser-message-title");
+const browserMessageBody = document.querySelector("#browser-message-body");
+const browserCloseButton = document.querySelector("#browser-close");
+const browserMinimizeButton = document.querySelector("#browser-minimize");
+const browserMaximizeButton = document.querySelector("#browser-maximize");
 const themeToggle = document.querySelector("#theme-toggle");
 
 const siteName = "irohn.net";
 const homeDirectory = "/home/guest";
+const browserApps = {
+  github: "https://github.com/irohn",
+  linkedin: "https://www.linkedin.com/in/ori-sne-356a92183",
+};
 const unknownCommandMessage =
   "Command not found. Type `help` to see available commands.";
 const permissionDeniedMessage =
@@ -27,13 +40,16 @@ const themeStorageKey = "irohn-theme-preference";
 
 let currentDirectory = homeDirectory;
 let isPinnedToBottom = true;
-let isMaximized = false;
 let isInteractive = false;
 let needsBootSequence = true;
 let bootSequenceToken = 0;
 let themePreference = window.localStorage.getItem(themeStorageKey) ?? "dark";
 let terminalWindowState = "closed";
-let isTerminalActive = false;
+let browserWindowState = "closed";
+let activeWindow = null;
+let isTerminalMaximized = false;
+let isBrowserMaximized = false;
+let activeBrowserApp = null;
 
 const fileSystem = createDirectory({
   home: createDirectory({
@@ -330,37 +346,87 @@ function setInteractiveState(value) {
   isInteractive = value;
 }
 
-function setTerminalActive(value) {
-  isTerminalActive = value;
+function setActiveWindow(windowName) {
+  activeWindow = windowName;
   syncWindowState();
 }
 
+function activateVisibleWindow() {
+  if (browserWindowState === "open" && !browser.hidden) {
+    setActiveWindow("browser");
+    browser.focus({ preventScroll: true });
+    return;
+  }
+
+  if (terminalWindowState === "open" && !terminal.hidden) {
+    focusInput();
+    return;
+  }
+
+  setActiveWindow(null);
+}
+
 function isTerminalFocused() {
-  return terminalWindowState === "open" && isTerminalActive && document.hasFocus();
+  return terminalWindowState === "open" && activeWindow === "terminal" && document.hasFocus();
+}
+
+function isBrowserFocused() {
+  return browserWindowState === "open" && activeWindow === "browser" && document.hasFocus();
+}
+
+function getWindowIndicatorState(windowState, isFocused) {
+  if (windowState === "closed") {
+    return "closed";
+  }
+
+  return isFocused ? "focused" : "inactive";
+}
+
+function minimizeOtherWindows(targetWindow) {
+  if (targetWindow !== "terminal" && terminalWindowState === "open" && !terminal.hidden) {
+    terminalWindowState = "minimized";
+    terminal.hidden = true;
+  }
+
+  if (targetWindow !== "browser" && browserWindowState === "open" && !browser.hidden) {
+    browserWindowState = "minimized";
+    browser.hidden = true;
+  }
 }
 
 function syncWindowState() {
   const terminalFocused = isTerminalFocused();
+  const browserFocused = isBrowserFocused();
+  const isAnyWindowMaximized = isTerminalMaximized || isBrowserMaximized;
 
-  terminal.classList.toggle("terminal--maximized", isMaximized);
+  terminal.classList.toggle("terminal--maximized", isTerminalMaximized);
   terminal.classList.toggle("terminal--focused", terminalFocused);
   terminal.classList.toggle("terminal--inactive", !terminalFocused);
-  pageShell.classList.toggle("page-shell--maximized", isMaximized);
-  desktopDock.hidden = isMaximized;
-  themeToggle.hidden = isMaximized;
-  terminalLauncher.dataset.windowState = terminalFocused
-    ? "focused"
-    : terminalWindowState === "open"
-      ? "inactive"
-    : terminalWindowState === "minimized"
-      ? "minimized"
+  browser.classList.toggle("browser-window--maximized", isBrowserMaximized);
+  browser.classList.toggle("browser-window--focused", browserFocused);
+  browser.classList.toggle("browser-window--inactive", !browserFocused);
+  pageShell.classList.toggle("page-shell--maximized", isAnyWindowMaximized);
+  desktopDock.hidden = isAnyWindowMaximized;
+  themeToggle.hidden = isAnyWindowMaximized;
+  terminalLauncher.dataset.windowState = getWindowIndicatorState(
+    terminalWindowState,
+    terminalFocused
+  );
+  githubLauncher.dataset.windowState =
+    activeBrowserApp === "github"
+      ? getWindowIndicatorState(browserWindowState, browserFocused)
+      : "closed";
+  linkedinLauncher.dataset.windowState =
+    activeBrowserApp === "linkedin"
+      ? getWindowIndicatorState(browserWindowState, browserFocused)
       : "closed";
 }
 
 function openTerminal() {
+  minimizeOtherWindows("terminal");
   terminalWindowState = "open";
-  isTerminalActive = true;
   terminal.hidden = false;
+  setActiveWindow("terminal");
   syncWindowState();
   focusInput();
   scrollToBottom();
@@ -372,16 +438,17 @@ function openTerminal() {
 
 function minimizeTerminal() {
   terminalWindowState = "minimized";
-  isTerminalActive = false;
+  if (activeWindow === "terminal") {
+    activeWindow = null;
+  }
   terminal.hidden = true;
-  syncWindowState();
+  activateVisibleWindow();
 }
 
 function resetTerminalState({ shouldBootSequence = false } = {}) {
   currentDirectory = homeDirectory;
   isPinnedToBottom = true;
-  isMaximized = false;
-  isTerminalActive = false;
+  isTerminalMaximized = false;
   needsBootSequence = shouldBootSequence;
   bootSequenceToken += 1;
   setInteractiveState(!shouldBootSequence);
@@ -398,14 +465,75 @@ function closeTerminal() {
   resetTerminalState();
   minimizeTerminal();
   terminalWindowState = "closed";
-  syncWindowState();
+  if (activeWindow === "terminal") {
+    activeWindow = null;
+  }
+  activateVisibleWindow();
 }
 
 function toggleMaximize() {
-  isMaximized = !isMaximized;
+  isTerminalMaximized = !isTerminalMaximized;
+  setActiveWindow("terminal");
   syncWindowState();
   focusInput();
   scrollToBottom();
+}
+
+function updateBrowserFallback(url) {
+  browserAddress.textContent = url;
+  browserMessageTitle.textContent = `${url} is blocking iframe, opening in new tab...`;
+  browserMessageBody.textContent = "Continue in the newly opened browser tab.";
+}
+
+function openBrowser(appName) {
+  const url = browserApps[appName];
+
+  if (!url) {
+    return;
+  }
+
+  minimizeOtherWindows("browser");
+  activeBrowserApp = appName;
+  browserWindowState = "open";
+  browser.hidden = false;
+  updateBrowserFallback(url);
+  setActiveWindow("browser");
+  syncWindowState();
+  browser.focus({ preventScroll: true });
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function minimizeBrowser() {
+  browserWindowState = "minimized";
+  if (activeWindow === "browser") {
+    activeWindow = null;
+  }
+
+  browser.hidden = true;
+  activateVisibleWindow();
+}
+
+function closeBrowser() {
+  browserWindowState = "closed";
+  isBrowserMaximized = false;
+  browser.hidden = true;
+  browserAddress.textContent = "";
+  browserMessageTitle.textContent = "";
+  browserMessageBody.textContent = "";
+  activeBrowserApp = null;
+
+  if (activeWindow === "browser") {
+    activeWindow = null;
+  }
+
+  activateVisibleWindow();
+}
+
+function toggleBrowserMaximize() {
+  isBrowserMaximized = !isBrowserMaximized;
+  setActiveWindow("browser");
+  syncWindowState();
+  browser.focus({ preventScroll: true });
 }
 
 function syncCurrentLine() {
@@ -663,8 +791,7 @@ function handleCommandResult(result) {
 
 function focusInput() {
   if (terminalWindowState === "open") {
-    isTerminalActive = true;
-    syncWindowState();
+    setActiveWindow("terminal");
   }
 
   terminalInput.focus({ preventScroll: true });
@@ -708,37 +835,58 @@ async function runBootSequence() {
 
 terminal.addEventListener("click", focusInput);
 terminal.addEventListener("focus", focusInput);
+browser.addEventListener("click", () => {
+  if (browserWindowState === "open") {
+    setActiveWindow("browser");
+  }
+});
+browser.addEventListener("focus", () => {
+  if (browserWindowState === "open") {
+    setActiveWindow("browser");
+  }
+});
 document.addEventListener("pointerdown", (event) => {
-  if (terminalWindowState !== "open") {
+  if (terminalWindowState === "open" && terminal.contains(event.target)) {
+    setActiveWindow("terminal");
     return;
   }
 
-  if (terminal.contains(event.target)) {
-    setTerminalActive(true);
+  if (browserWindowState === "open" && browser.contains(event.target)) {
+    setActiveWindow("browser");
     return;
   }
 
-  setTerminalActive(false);
+  setActiveWindow(null);
 });
 document.addEventListener("focusin", (event) => {
-  if (terminalWindowState !== "open") {
-    return;
-  }
-
   if (event.target === terminalInput || terminal.contains(event.target)) {
-    setTerminalActive(true);
+    setActiveWindow("terminal");
     return;
   }
 
-  setTerminalActive(false);
+  if (browser.contains(event.target)) {
+    setActiveWindow("browser");
+    return;
+  }
+
+  setActiveWindow(null);
 });
 window.addEventListener("focus", syncWindowState);
 window.addEventListener("blur", syncWindowState);
 document.addEventListener("visibilitychange", syncWindowState);
 terminalLauncher.addEventListener("click", openTerminal);
+githubLauncher.addEventListener("click", () => {
+  openBrowser("github");
+});
+linkedinLauncher.addEventListener("click", () => {
+  openBrowser("linkedin");
+});
 closeButton.addEventListener("click", closeTerminal);
 minimizeButton.addEventListener("click", minimizeTerminal);
 maximizeButton.addEventListener("click", toggleMaximize);
+browserCloseButton.addEventListener("click", closeBrowser);
+browserMinimizeButton.addEventListener("click", minimizeBrowser);
+browserMaximizeButton.addEventListener("click", toggleBrowserMaximize);
 themeToggle.addEventListener("click", () => {
   const resolvedTheme = getResolvedTheme();
   themePreference = resolvedTheme === "dark" ? "light" : "dark";

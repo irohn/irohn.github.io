@@ -22,11 +22,10 @@
           <span class="desktop-app__icon desktop-app__icon--terminal" aria-hidden="true">>_</span>
         </button>
 
-        <a
+        <button
+          id="github-launcher"
           class="desktop-app"
-          href="https://github.com/irohn"
-          target="_blank"
-          rel="noreferrer noopener"
+          type="button"
           aria-label="Open GitHub"
         >
           <span class="desktop-app__icon desktop-app__icon--github" aria-hidden="true">
@@ -36,13 +35,12 @@
               />
             </svg>
           </span>
-        </a>
+        </button>
 
-        <a
+        <button
+          id="linkedin-launcher"
           class="desktop-app"
-          href="https://www.linkedin.com/in/ori-sne-356a92183"
-          target="_blank"
-          rel="noreferrer noopener"
+          type="button"
           aria-label="Open LinkedIn"
         >
           <span class="desktop-app__icon desktop-app__icon--linkedin" aria-hidden="true">
@@ -52,7 +50,7 @@
               />
             </svg>
           </span>
-        </a>
+        </button>
       </div>
 
       <section
@@ -102,6 +100,53 @@
             <span id="terminal-text" class="terminal__text"></span>
             <span class="terminal__cursor" aria-hidden="true"></span>
           </label>
+        </div>
+      </section>
+
+      <section
+        id="browser-window"
+        class="browser-window"
+        aria-label="Browser window"
+        tabindex="0"
+        hidden
+      >
+        <div class="terminal__chrome browser__chrome">
+          <div class="terminal__controls">
+            <button
+              id="browser-close"
+              class="terminal__dot terminal__dot--close"
+              type="button"
+              aria-label="Close browser"
+            >
+              <span class="terminal__dot-icon" aria-hidden="true">x</span>
+            </button>
+            <button
+              id="browser-minimize"
+              class="terminal__dot terminal__dot--minimize"
+              type="button"
+              aria-label="Minimize browser"
+            >
+              <span class="terminal__dot-icon" aria-hidden="true">-</span>
+            </button>
+            <button
+              id="browser-maximize"
+              class="terminal__dot terminal__dot--maximize"
+              type="button"
+              aria-label="Maximize browser"
+            >
+              <span class="terminal__dot-icon" aria-hidden="true">□</span>
+            </button>
+          </div>
+
+          <div class="browser__address" id="browser-address"></div>
+        </div>
+
+        <div class="browser__body">
+          <div class="browser__fallback">
+            <p class="browser__status browser__status--muted">External site</p>
+            <h1 id="browser-message-title" class="browser__title"></h1>
+            <p id="browser-message-body" class="browser__status"></p>
+          </div>
         </div>
       </section>
 

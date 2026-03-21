@@ -173,7 +173,8 @@ body {
   fill: currentColor;
 }
 
-.terminal {
+.terminal,
+.browser-window {
   width: min(100%, 960px);
   height: clamp(32rem, 70vh, 52rem);
   max-height: calc(100vh - 7rem);
@@ -186,24 +187,31 @@ body {
   box-shadow: none;
   overflow: hidden;
   transition: box-shadow 160ms ease;
+  position: relative;
+  z-index: 1;
 }
 
-.terminal[hidden] {
+.terminal[hidden],
+.browser-window[hidden] {
   display: none;
 }
 
-.terminal--maximized {
+.terminal--maximized,
+.browser-window--maximized {
   width: 100%;
   height: 100%;
   max-height: none;
   border-radius: 12px;
 }
 
-.terminal--focused {
+.terminal--focused,
+.browser-window--focused {
   box-shadow: 0 24px 80px var(--terminal-shadow);
+  z-index: 3;
 }
 
-.terminal:focus-visible {
+.terminal:focus-visible,
+.browser-window:focus-visible {
   outline: 2px solid rgba(163, 255, 176, 0.45);
   outline-offset: 4px;
 }
@@ -214,6 +222,10 @@ body {
   padding: 0.45rem 0.75rem;
   border-bottom: 1px solid var(--terminal-border);
   background: rgba(255, 255, 255, 0.02);
+}
+
+.browser__chrome {
+  gap: 0.75rem;
 }
 
 .terminal__controls {
@@ -477,6 +489,63 @@ body {
 .terminal--inactive .terminal__cursor {
   animation: none;
   opacity: 0;
+}
+
+.browser__address {
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--terminal-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.browser__body {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.browser-window--maximized .browser__body {
+  padding: 0.75rem;
+}
+
+.browser__fallback {
+  width: min(100%, 34rem);
+  padding: 1.35rem 1.45rem;
+  border: 1px solid var(--terminal-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.browser__title,
+.browser__status {
+  margin: 0;
+}
+
+.browser__title {
+  font-size: 1.1rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.browser__status {
+  margin-top: 0.45rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.browser__status--muted {
+  margin-bottom: 0.55rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .terminal__input {
