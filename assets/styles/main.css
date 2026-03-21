@@ -19,7 +19,8 @@
   --desktop-app-background: rgba(255, 255, 255, 0.02);
   --desktop-app-border: rgba(255, 255, 255, 0.04);
   --desktop-app-icon-background: rgba(255, 255, 255, 0.05);
-  --desktop-app-github: #d6d6d6;
+  --desktop-app-terminal: #f5f5f5;
+  --desktop-app-browser: #d6d6d6;
   --desktop-app-indicator-active: rgba(255, 255, 255, 0.94);
   --desktop-app-indicator-inactive: rgba(255, 255, 255, 0.28);
   --font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono",
@@ -52,7 +53,8 @@
   --desktop-app-background: rgba(15, 23, 42, 0.03);
   --desktop-app-border: rgba(15, 23, 42, 0.06);
   --desktop-app-icon-background: rgba(15, 23, 42, 0.05);
-  --desktop-app-github: #202938;
+  --desktop-app-terminal: #18212f;
+  --desktop-app-browser: #202938;
   --desktop-app-indicator-active: rgba(24, 33, 47, 0.92);
   --desktop-app-indicator-inactive: rgba(24, 33, 47, 0.28);
 }
@@ -158,16 +160,20 @@ body {
 }
 
 .desktop-app__icon--terminal {
-  color: var(--text-prompt);
+  color: var(--desktop-app-terminal);
 }
 
-.desktop-app__icon--github,
-.desktop-app__icon--linkedin {
-  color: var(--desktop-app-github);
+.desktop-app__icon--terminal svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
 }
 
-.desktop-app__icon--github svg,
-.desktop-app__icon--linkedin svg {
+.desktop-app__icon--browser {
+  color: var(--desktop-app-browser);
+}
+
+.desktop-app__icon--browser svg {
   width: 1.4rem;
   height: 1.4rem;
   fill: currentColor;
@@ -226,6 +232,7 @@ body {
 
 .browser__chrome {
   gap: 0.75rem;
+  padding: 0.35rem 0.65rem;
 }
 
 .terminal__controls {
@@ -491,9 +498,13 @@ body {
   opacity: 0;
 }
 
-.browser__address {
+.browser__address-shell {
   flex: 1;
   min-width: 0;
+}
+
+.browser__address {
+  width: 100%;
   padding: 0.35rem 0.7rem;
   border: 1px solid var(--terminal-border);
   border-radius: 999px;
@@ -504,48 +515,24 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font: inherit;
 }
 
 .browser__body {
   flex: 1;
-  display: grid;
-  place-items: center;
-  padding: 1.5rem;
+  min-height: 0;
+  padding: 0;
 }
 
 .browser-window--maximized .browser__body {
-  padding: 0.75rem;
+  padding: 0;
 }
 
-.browser__fallback {
-  width: min(100%, 34rem);
-  padding: 1.35rem 1.45rem;
-  border: 1px solid var(--terminal-border);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.browser__title,
-.browser__status {
-  margin: 0;
-}
-
-.browser__title {
-  font-size: 1.1rem;
-  line-height: 1.4;
-  color: var(--text-primary);
-}
-
-.browser__status {
-  margin-top: 0.45rem;
-  line-height: 1.5;
-  color: var(--text-primary);
-}
-
-.browser__status--muted {
-  margin-bottom: 0.55rem;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+.browser__frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #ffffff;
 }
 
 .terminal__input {

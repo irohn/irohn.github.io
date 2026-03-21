@@ -8,15 +8,13 @@ const introLine = document.querySelector(".terminal__line--muted");
 const promptElements = document.querySelectorAll(".terminal__prompt");
 const desktopDock = document.querySelector("#desktop-dock");
 const terminalLauncher = document.querySelector("#terminal-launcher");
-const githubLauncher = document.querySelector("#github-launcher");
-const linkedinLauncher = document.querySelector("#linkedin-launcher");
+const browserLauncher = document.querySelector("#browser-launcher");
 const closeButton = document.querySelector("#terminal-close");
 const minimizeButton = document.querySelector("#terminal-minimize");
 const maximizeButton = document.querySelector("#terminal-maximize");
 const browser = document.querySelector("#browser-window");
 const browserAddress = document.querySelector("#browser-address");
-const browserMessageTitle = document.querySelector("#browser-message-title");
-const browserMessageBody = document.querySelector("#browser-message-body");
+const browserFrame = document.querySelector("#browser-frame");
 const browserCloseButton = document.querySelector("#browser-close");
 const browserMinimizeButton = document.querySelector("#browser-minimize");
 const browserMaximizeButton = document.querySelector("#browser-maximize");
@@ -24,10 +22,7 @@ const themeToggle = document.querySelector("#theme-toggle");
 
 const siteName = "irohn.net";
 const homeDirectory = "/home/guest";
-const browserApps = {
-  github: "https://github.com/irohn",
-  linkedin: "https://www.linkedin.com/in/ori-sne-356a92183",
-};
+const browserHomePage = "links.html";
 const unknownCommandMessage =
   "Command not found. Type `help` to see available commands.";
 const permissionDeniedMessage =
@@ -49,7 +44,7 @@ let browserWindowState = "closed";
 let activeWindow = null;
 let isTerminalMaximized = false;
 let isBrowserMaximized = false;
-let activeBrowserApp = null;
+let browserNavigationToken = 0;
 
 const fileSystem = createDirectory({
   home: createDirectory({
@@ -412,14 +407,10 @@ function syncWindowState() {
     terminalWindowState,
     terminalFocused
   );
-  githubLauncher.dataset.windowState =
-    activeBrowserApp === "github"
-      ? getWindowIndicatorState(browserWindowState, browserFocused)
-      : "closed";
-  linkedinLauncher.dataset.windowState =
-    activeBrowserApp === "linkedin"
-      ? getWindowIndicatorState(browserWindowState, browserFocused)
-      : "closed";
+  browserLauncher.dataset.windowState = getWindowIndicatorState(
+    browserWindowState,
+    browserFocused
+  );
 }
 
 function openTerminal() {
@@ -479,28 +470,132 @@ function toggleMaximize() {
   scrollToBottom();
 }
 
-function updateBrowserFallback(url) {
-  browserAddress.textContent = url;
-  browserMessageTitle.textContent = `${url} is blocking iframe, opening in new tab...`;
-  browserMessageBody.textContent = "Continue in the newly opened browser tab.";
+function isExternalBrowserTarget(target) {
+  return /^https?:\/\//i.test(target);
 }
 
-function openBrowser(appName) {
-  const url = browserApps[appName];
+function normalizeBrowserTarget(value) {
+  const trimmedValue = String(value ?? "").trim();
 
-  if (!url) {
+  if (!trimmedValue) {
+    return browserHomePage;
+  }
+
+  if (
+    trimmedValue.startsWith("/") ||
+    trimmedValue.startsWith("./") ||
+    trimmedValue.startsWith("../")
+  ) {
+    return trimmedValue;
+  }
+
+  if (!trimmedValue.includes("://")) {
+    if (
+      /^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/.*)?$/i.test(trimmedValue) &&
+      !/\.html?(\/.*)?$/i.test(trimmedValue)
+    ) {
+      return `https://${trimmedValue}`;
+    }
+
+    return trimmedValue;
+  }
+
+  return trimmedValue;
+}
+
+function navigateBrowser(rawTarget = browserAddress.textContent) {
+  const target = normalizeBrowserTarget(rawTarget);
+  const navigationToken = ++browserNavigationToken;
+
+  browserAddress.textContent = target;
+  browserFrame.src = target;
+
+  if (!isExternalBrowserTarget(target)) {
     return;
   }
 
+  const fallbackTimer = window.setTimeout(() => {
+    if (navigationToken !== browserNavigationToken) {
+      return;
+    }
+
+    browserFrame.removeAttribute("src");
+    window.open(target, "_blank", "noopener,noreferrer");
+  }, 1400);
+
+  browserFrame.addEventListener(
+    "load",
+    () => {
+      if (navigationToken !== browserNavigationToken) {
+        return;
+      }
+
+      window.clearTimeout(fallbackTimer);
+    },
+    { once: true }
+  );
+}
+
+function openBrowser(target = browserHomePage) {
+  const initialTarget =
+    typeof target === "string" || target == null ? target ?? browserHomePage : browserHomePage;
+
   minimizeOtherWindows("browser");
-  activeBrowserApp = appName;
   browserWindowState = "open";
   browser.hidden = false;
-  updateBrowserFallback(url);
   setActiveWindow("browser");
   syncWindowState();
   browser.focus({ preventScroll: true });
-  window.open(url, "_blank", "noopener,noreferrer");
+  window.requestAnimationFrame(() => {
+    if (browserWindowState !== "open" || browser.hidden) {
+      return;
+    }
+
+    navigateBrowser(initialTarget);
+  });
+}
+
+function bindBrowserFrameFocus() {
+  if (!browserFrame) {
+    return;
+  }
+
+  browserFrame.addEventListener("focus", () => {
+    if (browserWindowState === "open") {
+      setActiveWindow("browser");
+    }
+  });
+
+  browserFrame.addEventListener("load", () => {
+    if (browserWindowState !== "open") {
+      return;
+    }
+
+    setActiveWindow("browser");
+
+    try {
+      const frameWindow = browserFrame.contentWindow;
+      const frameDocument = frameWindow?.document;
+
+      if (!frameWindow || !frameDocument) {
+        return;
+      }
+
+      frameWindow.addEventListener("focus", () => {
+        if (browserWindowState === "open") {
+          setActiveWindow("browser");
+        }
+      });
+
+      frameDocument.addEventListener("pointerdown", () => {
+        if (browserWindowState === "open") {
+          setActiveWindow("browser");
+        }
+      });
+    } catch (_error) {
+      // Cross-origin frames are expected to block access.
+    }
+  });
 }
 
 function minimizeBrowser() {
@@ -516,11 +611,10 @@ function minimizeBrowser() {
 function closeBrowser() {
   browserWindowState = "closed";
   isBrowserMaximized = false;
+  browserNavigationToken += 1;
   browser.hidden = true;
   browserAddress.textContent = "";
-  browserMessageTitle.textContent = "";
-  browserMessageBody.textContent = "";
-  activeBrowserApp = null;
+  browserFrame.removeAttribute("src");
 
   if (activeWindow === "browser") {
     activeWindow = null;
@@ -874,13 +968,9 @@ document.addEventListener("focusin", (event) => {
 window.addEventListener("focus", syncWindowState);
 window.addEventListener("blur", syncWindowState);
 document.addEventListener("visibilitychange", syncWindowState);
+bindBrowserFrameFocus();
 terminalLauncher.addEventListener("click", openTerminal);
-githubLauncher.addEventListener("click", () => {
-  openBrowser("github");
-});
-linkedinLauncher.addEventListener("click", () => {
-  openBrowser("linkedin");
-});
+browserLauncher.addEventListener("click", openBrowser);
 closeButton.addEventListener("click", closeTerminal);
 minimizeButton.addEventListener("click", minimizeTerminal);
 maximizeButton.addEventListener("click", toggleMaximize);
