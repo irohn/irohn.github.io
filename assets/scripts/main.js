@@ -83,6 +83,7 @@ const bashrcContent = `# ~/.bashrc: executed by bash(1)
 HISTSIZE=1000
 
 alias www="cd /srv/irohn.net"`;
+const bashHistoryPath = `${homeDirectory}/.bash_history`;
 
 let currentDirectory = homeDirectory;
 let isPinnedToBottom = true;
@@ -101,11 +102,15 @@ let isBrowserMaximized = false;
 let isWallpaperMaximized = false;
 let browserNavigationToken = 0;
 let currentBrowserPage = browserHomePage;
+let commandHistoryEntries = [bootCommand];
+let commandHistoryIndex = null;
+let commandHistoryDraft = "";
 
 const fileSystem = createDirectory({
   home: createDirectory({
     guest: createDirectory({
       ".bashrc": createFile(bashrcContent),
+      ".bash_history": createFile(bootCommand),
       Documents: createDirectory({}),
       Downloads: createDirectory({}),
       Games: createDirectory({}),
@@ -169,6 +174,16 @@ const commands = {
       }
 
       return output([`help: unknown topic: ${args[0]}`, "Try `help commands`."]);
+    },
+  },
+  history: {
+    description: "Show command history.",
+    example: "history",
+    builtin: true,
+    run() {
+      return output(
+        commandHistoryEntries.map((entry, index) => `${String(index + 1).padStart(4, " ")}  ${entry}`)
+      );
     },
   },
   whoami: {
@@ -317,6 +332,14 @@ function readFile(node) {
   return typeof node.content === "function" ? node.content() : node.content;
 }
 
+function writeFile(node, content) {
+  if (node?.type !== "file") {
+    return;
+  }
+
+  node.content = content;
+}
+
 function output(lines) {
   return { type: "output", lines };
 }
@@ -331,6 +354,67 @@ function createEntryToken(value, entryType) {
 
 function buildHelpLines() {
   return buildHelpOverviewLines();
+}
+
+function syncBashHistoryFile() {
+  const historyNode = getNode(bashHistoryPath);
+
+  if (!historyNode || historyNode.type !== "file") {
+    return;
+  }
+
+  writeFile(historyNode, commandHistoryEntries.join("\n"));
+}
+
+function resetCommandHistory() {
+  commandHistoryEntries = [bootCommand];
+  commandHistoryIndex = null;
+  commandHistoryDraft = "";
+  syncBashHistoryFile();
+}
+
+function appendCommandHistory(command) {
+  const value = String(command ?? "").trim();
+
+  if (!value) {
+    return;
+  }
+
+  commandHistoryEntries.push(value);
+  commandHistoryIndex = null;
+  commandHistoryDraft = "";
+  syncBashHistoryFile();
+}
+
+function navigateCommandHistory(direction) {
+  if (!commandHistoryEntries.length) {
+    return;
+  }
+
+  if (direction === "up") {
+    if (commandHistoryIndex === null) {
+      commandHistoryDraft = terminalInput.value;
+      commandHistoryIndex = commandHistoryEntries.length - 1;
+    } else if (commandHistoryIndex > 0) {
+      commandHistoryIndex -= 1;
+    }
+  } else if (direction === "down") {
+    if (commandHistoryIndex === null) {
+      return;
+    }
+
+    if (commandHistoryIndex < commandHistoryEntries.length - 1) {
+      commandHistoryIndex += 1;
+    } else {
+      commandHistoryIndex = null;
+      terminalInput.value = commandHistoryDraft;
+      syncCurrentLine();
+      return;
+    }
+  }
+
+  terminalInput.value = commandHistoryEntries[commandHistoryIndex] ?? "";
+  syncCurrentLine();
 }
 
 function buildHelpOverviewLines() {
@@ -953,6 +1037,7 @@ function resetTerminalState({ shouldBootSequence = false } = {}) {
   terminalInput.value = "";
   terminalText.textContent = "";
   introLine.hidden = false;
+  resetCommandHistory();
   syncPrompt();
   syncWindowState();
 }
@@ -1429,8 +1514,16 @@ function runCommand(rawValue) {
   return command.run(args, rawValue);
 }
 
-function submitCommand(rawValue) {
+function submitCommand(rawValue, { recordHistory = true } = {}) {
   const result = runCommand(rawValue);
+  const trimmedValue = rawValue.trim();
+
+  if (recordHistory) {
+    appendCommandHistory(trimmedValue);
+  } else {
+    commandHistoryIndex = null;
+    commandHistoryDraft = "";
+  }
 
   if (result.type !== "clear" && result.type !== "close") {
     addPromptLine(rawValue);
@@ -1471,7 +1564,7 @@ function completeBootSequence(sequenceToken) {
 
   terminalInput.value = bootCommand;
   terminalText.textContent = terminalInput.value;
-  submitCommand(bootCommand);
+  submitCommand(bootCommand, { recordHistory: false });
   setInteractiveState(true);
 
   if (!terminal.hidden) {
@@ -1668,6 +1761,18 @@ terminalInput.addEventListener("input", syncCurrentLine);
 terminalInput.addEventListener("keydown", (event) => {
   if (!isInteractive) {
     event.preventDefault();
+    return;
+  }
+
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    navigateCommandHistory("up");
+    return;
+  }
+
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    navigateCommandHistory("down");
     return;
   }
 
