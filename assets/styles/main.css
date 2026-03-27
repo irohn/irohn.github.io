@@ -945,6 +945,10 @@ body {
   color: #f5f5f5;
 }
 
+:root[data-theme="light"] .accent-preset[data-accent="white"] {
+  color: #202938;
+}
+
 .accent-preset[data-accent="red"] {
   color: #ff6b6b;
 }

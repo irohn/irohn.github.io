@@ -593,28 +593,34 @@ function renderBubbleWallpaper(root, theme) {
   );
 
   const bubblesGroup = createSvgElement("g");
-  const particlesGroup = createSvgElement("g", { opacity: 0.55 });
   const bubbles = [
-    [140, 1040, 18, 180, 12],
-    [250, 1080, 26, 220, 15],
-    [360, 1060, 14, 150, 11],
-    [520, 1090, 22, 230, 14],
-    [650, 1070, 17, 210, 10],
-    [760, 1100, 28, 160, 16],
-    [905, 1080, 20, 240, 13],
-    [1040, 1060, 24, 190, 12],
-    [1180, 1090, 15, 230, 11],
-    [1295, 1050, 19, 175, 14],
-    [1415, 1085, 23, 210, 15],
-    [1510, 1105, 16, 170, 12],
+    [90, 1120, 62, 180, 12],
+    [210, 1095, 88, 220, 14],
+    [330, 1140, 52, 150, 10],
+    [470, 1105, 76, 230, 13],
+    [620, 1135, 58, 205, 11],
+    [760, 1088, 98, 165, 15],
+    [900, 1125, 70, 245, 12],
+    [1040, 1102, 84, 192, 13],
+    [1175, 1145, 56, 232, 10],
+    [1290, 1086, 68, 176, 14],
+    [1410, 1120, 82, 214, 13],
+    [1525, 1100, 60, 170, 11],
+    [170, 1180, 108, 250, 16],
+    [560, 1188, 94, 286, 15],
+    [980, 1192, 116, 268, 17],
+    [1380, 1184, 102, 258, 16],
   ];
 
-  bubbles.forEach(([cx, cy, radius, peak, duration], index) => {
+  bubbles.forEach(([cx, cy, radius, _peak, duration], index) => {
     const bubbleColor = index % 2 === 0 ? palette.muted : palette.soft;
     const motionClass = radius <= 16 ? "small" : radius <= 22 ? "medium" : "large";
     const riseSeconds = duration / 1.5;
     const riseDuration = riseSeconds.toFixed(2);
     const risePhaseOffset = `-${((index * riseSeconds) / bubbles.length).toFixed(2)}s`;
+    const bubbleOpacity =
+      (theme === "light" ? 0.1 : 0.085) +
+      ((index % 5) * (theme === "light" ? 0.028 : 0.024));
     const wobbleDuration =
       motionClass === "small"
         ? (1.85 + (index % 3) * 0.16).toFixed(2)
@@ -643,7 +649,7 @@ function renderBubbleWallpaper(root, theme) {
             ? radius * 1.0
             : radius * 1.01,
       fill: bubbleColor,
-      opacity: theme === "light" ? 0.16 : 0.14,
+      opacity: bubbleOpacity,
     });
     appendAnimate(
       bubble,
@@ -672,7 +678,7 @@ function renderBubbleWallpaper(root, theme) {
     appendAnimate(
       bubble,
       "opacity",
-      `0;0.56;${index % 10 === 0 ? 0.18 : 0.56};0`,
+      `0;${bubbleOpacity.toFixed(3)};${bubbleOpacity.toFixed(3)};0`,
       `${riseDuration}s`,
       {
         begin: risePhaseOffset,
@@ -693,30 +699,9 @@ function renderBubbleWallpaper(root, theme) {
       })
     );
     bubblesGroup.append(bubble);
-
-    if ((index + 1) % 10 === 0) {
-      for (let particleIndex = 0; particleIndex < 6; particleIndex += 1) {
-        const angle = (Math.PI * 2 * particleIndex) / 6;
-        const px = cx + Math.cos(angle) * 26;
-        const py = peak + Math.sin(angle) * 26;
-        const particle = createSvgElement("circle", {
-          cx,
-          cy: peak,
-          r: 1.8,
-          fill: palette.accent,
-          opacity: 0,
-        });
-        const popBegin = `-${((((index * riseSeconds) / bubbles.length) + riseSeconds * 0.9) % riseSeconds).toFixed(2)}s`;
-        appendAnimate(particle, "cx", `${cx};${px}`, "1.2s", { begin: popBegin });
-        appendAnimate(particle, "cy", `${peak};${py}`, "1.2s", { begin: popBegin });
-        appendAnimate(particle, "opacity", "0;0;0.7;0", "1.2s", { begin: popBegin });
-        appendAnimate(particle, "r", "1.8;1.3;0.2", "1.2s", { begin: popBegin });
-        particlesGroup.append(particle);
-      }
-    }
   });
 
-  root.append(bubblesGroup, particlesGroup);
+  root.append(bubblesGroup);
 }
 
 function renderRainWallpaper(root, theme) {
