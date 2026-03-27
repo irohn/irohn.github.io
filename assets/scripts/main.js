@@ -1,4 +1,5 @@
-const wallpaperImage = document.querySelector("#wallpaper-image");
+const svgNamespace = "http://www.w3.org/2000/svg";
+const wallpaperCanvas = document.querySelector("#wallpaper-canvas");
 const terminal = document.querySelector(".terminal");
 const pageShell = document.querySelector(".page-shell");
 const terminalBody = document.querySelector(".terminal__body");
@@ -10,6 +11,7 @@ const promptElements = document.querySelectorAll(".terminal__prompt");
 const desktopDock = document.querySelector("#desktop-dock");
 const terminalLauncher = document.querySelector("#terminal-launcher");
 const browserLauncher = document.querySelector("#browser-launcher");
+const wallpaperLauncher = document.querySelector("#wallpaper-launcher");
 const closeButton = document.querySelector("#terminal-close");
 const minimizeButton = document.querySelector("#terminal-minimize");
 const maximizeButton = document.querySelector("#terminal-maximize");
@@ -19,6 +21,11 @@ const browserFrame = document.querySelector("#browser-frame");
 const browserCloseButton = document.querySelector("#browser-close");
 const browserMinimizeButton = document.querySelector("#browser-minimize");
 const browserMaximizeButton = document.querySelector("#browser-maximize");
+const wallpaperWindow = document.querySelector("#wallpaper-window");
+const wallpaperCloseButton = document.querySelector("#wallpaper-close");
+const wallpaperMinimizeButton = document.querySelector("#wallpaper-minimize");
+const wallpaperMaximizeButton = document.querySelector("#wallpaper-maximize");
+const wallpaperOptions = document.querySelectorAll(".wallpaper-option");
 const themeToggle = document.querySelector("#theme-toggle");
 
 const siteName = "irohn.net";
@@ -38,10 +45,9 @@ const aliases = {
   www: "cd /srv/irohn.net",
 };
 const wallpapers = {
-  default: {
-    dark: "assets/images/wallpaper-default-dark.svg",
-    light: "assets/images/wallpaper-default-light.svg",
-  },
+  default: { label: "Lines" },
+  bubbles: { label: "Bubbles" },
+  rain: { label: "Rain" },
 };
 const bashrcContent = `# ~/.bashrc: executed by bash(1)
 
@@ -62,9 +68,11 @@ let themePreference = window.localStorage.getItem(themeStorageKey) ?? "dark";
 let wallpaperPreference = window.localStorage.getItem(wallpaperStorageKey) ?? "default";
 let terminalWindowState = "closed";
 let browserWindowState = "closed";
+let wallpaperWindowState = "closed";
 let activeWindow = null;
 let isTerminalMaximized = false;
 let isBrowserMaximized = false;
+let isWallpaperMaximized = false;
 let browserNavigationToken = 0;
 
 const fileSystem = createDirectory({
@@ -371,12 +379,335 @@ function getResolvedTheme() {
 }
 
 function getResolvedWallpaper() {
-  return wallpapers[wallpaperPreference] ?? wallpapers.default;
+  return wallpapers[wallpaperPreference] ? wallpaperPreference : "default";
+}
+
+function createSvgElement(tagName, attributes = {}) {
+  const element = document.createElementNS(svgNamespace, tagName);
+
+  Object.entries(attributes).forEach(([name, value]) => {
+    element.setAttribute(name, String(value));
+  });
+
+  return element;
+}
+
+function appendAnimate(element, attributeName, values, duration) {
+  element.append(
+    createSvgElement("animate", {
+      attributeName,
+      values,
+      dur: duration,
+      repeatCount: "indefinite",
+    })
+  );
+}
+
+function getWallpaperPalette(theme) {
+  if (theme === "light") {
+    return {
+      background: "#f3f5f8",
+      accent: "#1e2530",
+      muted: "#456c92",
+      soft: "#2f8a39",
+      haze: "rgba(255, 255, 255, 0.28)",
+    };
+  }
+
+  return {
+    background: "#101112",
+    accent: "#eef3f7",
+    muted: "#7fa8c9",
+    soft: "#7fe36a",
+    haze: "rgba(255, 255, 255, 0.14)",
+  };
+}
+
+function renderLineWallpaper(root, theme) {
+  const palette = getWallpaperPalette(theme);
+  const background = createSvgElement("rect", {
+    width: 1600,
+    height: 1000,
+    fill: palette.background,
+  });
+  const group = createSvgElement("g", {
+    stroke: palette.accent,
+    "stroke-linecap": "round",
+    "stroke-width": 3,
+    opacity: theme === "light" ? 0.34 : 0.38,
+  });
+  const definitions = [
+    [120, 180, 300, 150, "300;360;320;300", "150;138;168;150", "13s", "11s"],
+    [420, 120, 520, 260, "520;575;545;520", "260;330;290;260", "16s", "14s"],
+    [760, 110, 940, 108, "940;1020;980;940", null, "12s", null],
+    [1130, 160, 1230, 280, "1230;1290;1250;1230", "280;350;320;280", "15s", "12s"],
+    [1380, 120, 1510, 170, "1510;1565;1530;1510", "170;200;185;170", "10s", "9s"],
+    [180, 410, 280, 520, "280;350;315;280", "520;595;560;520", "14s", "15s"],
+    [520, 460, 710, 388, "710;800;760;710", "388;350;372;388", "17s", "13s"],
+    [905, 430, 1060, 600, "1060;1140;1105;1060", "600;690;650;600", "18s", "12s"],
+    [1280, 470, 1435, 415, "1435;1510;1475;1435", "415;390;404;415", "11s", "14s"],
+    [160, 760, 360, 750, "360;450;405;360", null, "15s", null],
+    [460, 760, 590, 900, "590;650;620;590", "900;970;935;900", "12s", "16s"],
+    [770, 760, 960, 830, "960;1045;1000;960", "830;865;846;830", "19s", "13s"],
+    [1115, 780, 1200, 650, "1200;1240;1222;1200", "650;585;615;650", "10s", "11s"],
+    [1360, 800, 1510, 915, "1510;1568;1542;1510", "915;975;945;915", "14s", "12s"],
+  ];
+
+  definitions.forEach(([x1, y1, x2, y2, x2Values, y2Values, xDur, yDur]) => {
+    const line = createSvgElement("line", { x1, y1, x2, y2 });
+    appendAnimate(line, "x2", x2Values, xDur);
+
+    if (y2Values && yDur) {
+      appendAnimate(line, "y2", y2Values, yDur);
+    }
+
+    group.append(line);
+  });
+
+  root.append(background, group);
+}
+
+function renderBubbleWallpaper(root, theme) {
+  const palette = getWallpaperPalette(theme);
+  root.append(
+    createSvgElement("rect", {
+      width: 1600,
+      height: 1000,
+      fill: palette.background,
+    })
+  );
+
+  const defs = createSvgElement("defs");
+  const bubblesGroup = createSvgElement("g");
+  const particlesGroup = createSvgElement("g", { opacity: 0.55 });
+  const bubbles = [
+    [140, 1040, 18, 180, 12],
+    [250, 1080, 26, 220, 15],
+    [360, 1060, 14, 150, 11],
+    [520, 1090, 22, 230, 14],
+    [650, 1070, 17, 210, 10],
+    [760, 1100, 28, 160, 16],
+    [905, 1080, 20, 240, 13],
+    [1040, 1060, 24, 190, 12],
+    [1180, 1090, 15, 230, 11],
+    [1295, 1050, 19, 175, 14],
+    [1415, 1085, 23, 210, 15],
+    [1510, 1105, 16, 170, 12],
+  ];
+
+  bubbles.forEach(([cx, cy, radius, peak, duration], index) => {
+    const bubbleColor = index % 2 === 0 ? palette.muted : palette.soft;
+    const gradientId = `bubble-gradient-${theme}-${index}`;
+    const motionClass = radius <= 16 ? "small" : radius <= 22 ? "medium" : "large";
+    const wobbleDuration =
+      motionClass === "small"
+        ? (1.85 + (index % 3) * 0.16).toFixed(2)
+        : motionClass === "medium"
+          ? (1.55 + (index % 4) * 0.18).toFixed(2)
+          : (1.35 + (index % 4) * 0.16).toFixed(2);
+    const tiltRange =
+      motionClass === "small"
+        ? 0.4 + (index % 2) * 0.18
+        : motionClass === "medium"
+          ? 0.9 + (index % 3) * 0.3
+          : 1.3 + (index % 4) * 0.35;
+    const angleDrift =
+      motionClass === "small"
+        ? (index % 2 === 0 ? 1 : -1) * (0.8 + (index % 2) * 0.35)
+        : motionClass === "medium"
+          ? (index % 2 === 0 ? 1 : -1) * (1.8 + (index % 3) * 0.7)
+          : (index % 2 === 0 ? 1 : -1) * (2.8 + (index % 4) * 0.9);
+    const gradient = createSvgElement("radialGradient", {
+      id: gradientId,
+      cx: `${32 + (index % 4) * 4}%`,
+      cy: `${30 + (index % 3) * 5}%`,
+      r: "78%",
+      fx: `${28 + (index % 4) * 4}%`,
+      fy: `${26 + (index % 3) * 4}%`,
+    });
+    gradient.append(
+      createSvgElement("stop", {
+        offset: "0%",
+        "stop-color": palette.accent,
+        "stop-opacity": theme === "light" ? 0.22 : 0.16,
+      }),
+      createSvgElement("stop", {
+        offset: "52%",
+        "stop-color": bubbleColor,
+        "stop-opacity": theme === "light" ? 0.12 : 0.1,
+      }),
+      createSvgElement("stop", {
+        offset: "100%",
+        "stop-color": bubbleColor,
+        "stop-opacity": theme === "light" ? 0.04 : 0.032,
+      })
+    );
+    defs.append(gradient);
+
+    const bubble = createSvgElement("ellipse", {
+      cx,
+      cy,
+      rx:
+        motionClass === "large"
+          ? radius * 1.05
+          : motionClass === "medium"
+            ? radius * 1.01
+            : radius * 0.99,
+      ry:
+        motionClass === "large"
+          ? radius * 0.95
+          : motionClass === "medium"
+            ? radius * 1.0
+            : radius * 1.01,
+      fill: `url(#${gradientId})`,
+      stroke: palette.accent,
+      "stroke-width": 1.15 + (index % 3) * 0.28,
+      opacity: 0.52,
+    });
+    appendAnimate(
+      bubble,
+      "rx",
+      motionClass === "small"
+        ? `${(radius * 0.99).toFixed(2)};${(radius * 1.01).toFixed(2)};${(radius * 0.98).toFixed(2)};${(radius * 0.99).toFixed(2)}`
+        : motionClass === "medium"
+          ? `${(radius * 1.01).toFixed(2)};${(radius * 1.05).toFixed(2)};${(radius * 0.98).toFixed(2)};${(radius * 1.02).toFixed(2)};${(radius * 1.01).toFixed(2)}`
+          : `${(radius * 1.05).toFixed(2)};${(radius * 1.12).toFixed(2)};${(radius * 1.0).toFixed(2)};${(radius * 1.08).toFixed(2)};${(radius * 1.05).toFixed(2)}`,
+      `${wobbleDuration}s`
+    );
+    appendAnimate(
+      bubble,
+      "ry",
+      motionClass === "small"
+        ? `${(radius * 1.01).toFixed(2)};${(radius * 0.99).toFixed(2)};${(radius * 1.02).toFixed(2)};${(radius * 1.01).toFixed(2)}`
+        : motionClass === "medium"
+          ? `${(radius * 1.0).toFixed(2)};${(radius * 0.96).toFixed(2)};${(radius * 1.04).toFixed(2)};${(radius * 0.99).toFixed(2)};${(radius * 1.0).toFixed(2)}`
+          : `${(radius * 0.95).toFixed(2)};${(radius * 0.9).toFixed(2)};${(radius * 1.0).toFixed(2)};${(radius * 0.93).toFixed(2)};${(radius * 0.95).toFixed(2)}`,
+      `${(Number(wobbleDuration) * 0.92).toFixed(2)}s`
+    );
+    appendAnimate(bubble, "cy", `${cy};${peak};-140`, `${duration}s`);
+    bubble.append(
+      createSvgElement("animate", {
+        attributeName: "cx",
+        values: `${cx};${cx + angleDrift}`,
+        dur: `${duration}s`,
+        repeatCount: "indefinite",
+        calcMode: "linear",
+      })
+    );
+    appendAnimate(
+      bubble,
+      "opacity",
+      `0;0.56;${index % 10 === 0 ? 0.18 : 0.56};0`,
+      `${duration}s`
+    );
+    bubble.append(
+      createSvgElement("animateTransform", {
+        attributeName: "transform",
+        type: "rotate",
+        values:
+          motionClass === "small"
+            ? `0 ${cx} ${cy};${tiltRange} ${cx} ${cy};0 ${cx} ${cy}`
+            : `0 ${cx} ${cy};${tiltRange} ${cx} ${cy};${-tiltRange * 0.3} ${cx} ${cy};0 ${cx} ${cy}`,
+        dur: `${(Number(wobbleDuration) * 1.05).toFixed(2)}s`,
+        repeatCount: "indefinite",
+      })
+    );
+    bubblesGroup.append(bubble);
+
+    if ((index + 1) % 10 === 0) {
+      for (let particleIndex = 0; particleIndex < 6; particleIndex += 1) {
+        const angle = (Math.PI * 2 * particleIndex) / 6;
+        const px = cx + Math.cos(angle) * 26;
+        const py = peak + Math.sin(angle) * 26;
+        const particle = createSvgElement("circle", {
+          cx,
+          cy: peak,
+          r: 1.8,
+          fill: palette.accent,
+          opacity: 0,
+        });
+        appendAnimate(particle, "cx", `${cx};${px}`, "1.2s");
+        appendAnimate(particle, "cy", `${peak};${py}`, "1.2s");
+        appendAnimate(particle, "opacity", "0;0;0.7;0", "1.2s");
+        appendAnimate(particle, "r", "1.8;1.3;0.2", "1.2s");
+        particlesGroup.append(particle);
+      }
+    }
+  });
+
+  root.append(defs, bubblesGroup, particlesGroup);
+}
+
+function renderRainWallpaper(root, theme) {
+  const palette = getWallpaperPalette(theme);
+  root.append(
+    createSvgElement("rect", {
+      width: 1600,
+      height: 1000,
+      fill: palette.background,
+    })
+  );
+
+  const rainGroup = createSvgElement("g", {
+    stroke: palette.accent,
+    "stroke-linecap": "round",
+    opacity: theme === "light" ? 0.26 : 0.28,
+  });
+  const drops = Array.from({ length: 28 }, (_, index) => {
+    const x = 40 + index * 58;
+    const top = -120 - (index % 6) * 60;
+    const length = 120 + (index % 5) * 28;
+    const duration = (0.9 + (index % 6) * 0.14) / 1.5;
+    const width = 1.3 + (index % 4) * 0.4;
+    return { x, top, length, duration, width };
+  });
+
+  drops.forEach(({ x, top, length, duration, width }, index) => {
+    const line = createSvgElement("line", {
+      x1: x,
+      y1: top,
+      x2: x - 18,
+      y2: top + length,
+      "stroke-width": width,
+    });
+    appendAnimate(line, "y1", `${top};${1160 + top}`, `${duration}s`);
+    appendAnimate(line, "y2", `${top + length};${1160 + top + length}`, `${duration}s`);
+    appendAnimate(line, "stroke-width", `${width};${width + 0.9};${width}`, `${duration * 1.4}s`);
+    appendAnimate(
+      line,
+      "opacity",
+      `0;${0.22 + (index % 5) * 0.05};${0.22 + (index % 5) * 0.05};0`,
+      `${duration}s`
+    );
+    rainGroup.append(line);
+  });
+
+  root.append(rainGroup);
+}
+
+function syncWallpaperOptions() {
+  const wallpaperType = getResolvedWallpaper();
+
+  wallpaperOptions.forEach((option) => {
+    option.setAttribute("aria-pressed", String(option.dataset.wallpaper === wallpaperType));
+  });
 }
 
 function applyWallpaper() {
-  const variant = getResolvedWallpaper();
-  wallpaperImage.src = variant[getResolvedTheme()];
+  const theme = getResolvedTheme();
+  const wallpaperType = getResolvedWallpaper();
+
+  wallpaperCanvas.replaceChildren();
+
+  if (wallpaperType === "bubbles") {
+    renderBubbleWallpaper(wallpaperCanvas, theme);
+  } else if (wallpaperType === "rain") {
+    renderRainWallpaper(wallpaperCanvas, theme);
+  } else {
+    renderLineWallpaper(wallpaperCanvas, theme);
+  }
+
+  syncWallpaperOptions();
 }
 
 function applyTheme() {
@@ -390,6 +721,16 @@ function applyTheme() {
   applyWallpaper();
 }
 
+function setWallpaperPreference(value) {
+  if (!wallpapers[value]) {
+    return;
+  }
+
+  wallpaperPreference = value;
+  window.localStorage.setItem(wallpaperStorageKey, wallpaperPreference);
+  applyWallpaper();
+}
+
 function setInteractiveState(value) {
   isInteractive = value;
 }
@@ -400,6 +741,12 @@ function setActiveWindow(windowName) {
 }
 
 function activateVisibleWindow() {
+  if (wallpaperWindowState === "open" && !wallpaperWindow.hidden) {
+    setActiveWindow("wallpaper");
+    wallpaperWindow.focus({ preventScroll: true });
+    return;
+  }
+
   if (browserWindowState === "open" && !browser.hidden) {
     setActiveWindow("browser");
     browser.focus({ preventScroll: true });
@@ -422,6 +769,12 @@ function isBrowserFocused() {
   return browserWindowState === "open" && activeWindow === "browser" && document.hasFocus();
 }
 
+function isWallpaperFocused() {
+  return (
+    wallpaperWindowState === "open" && activeWindow === "wallpaper" && document.hasFocus()
+  );
+}
+
 function getWindowIndicatorState(windowState, isFocused) {
   if (windowState === "closed") {
     return "closed";
@@ -434,18 +787,30 @@ function minimizeOtherWindows(targetWindow) {
   if (targetWindow !== "terminal" && terminalWindowState === "open" && !terminal.hidden) {
     terminalWindowState = "minimized";
     terminal.hidden = true;
+    terminalInput.blur();
   }
 
   if (targetWindow !== "browser" && browserWindowState === "open" && !browser.hidden) {
     browserWindowState = "minimized";
     browser.hidden = true;
   }
+
+  if (
+    targetWindow !== "wallpaper" &&
+    wallpaperWindowState === "open" &&
+    !wallpaperWindow.hidden
+  ) {
+    wallpaperWindowState = "minimized";
+    wallpaperWindow.hidden = true;
+  }
 }
 
 function syncWindowState() {
   const terminalFocused = isTerminalFocused();
   const browserFocused = isBrowserFocused();
-  const isAnyWindowMaximized = isTerminalMaximized || isBrowserMaximized;
+  const wallpaperFocused = isWallpaperFocused();
+  const isAnyWindowMaximized =
+    isTerminalMaximized || isBrowserMaximized || isWallpaperMaximized;
 
   terminal.classList.toggle("terminal--maximized", isTerminalMaximized);
   terminal.classList.toggle("terminal--focused", terminalFocused);
@@ -453,6 +818,9 @@ function syncWindowState() {
   browser.classList.toggle("browser-window--maximized", isBrowserMaximized);
   browser.classList.toggle("browser-window--focused", browserFocused);
   browser.classList.toggle("browser-window--inactive", !browserFocused);
+  wallpaperWindow.classList.toggle("wallpaper-window--maximized", isWallpaperMaximized);
+  wallpaperWindow.classList.toggle("wallpaper-window--focused", wallpaperFocused);
+  wallpaperWindow.classList.toggle("browser-window--inactive", !wallpaperFocused);
   pageShell.classList.toggle("page-shell--maximized", isAnyWindowMaximized);
   desktopDock.hidden = isAnyWindowMaximized;
   themeToggle.hidden = isAnyWindowMaximized;
@@ -463,6 +831,10 @@ function syncWindowState() {
   browserLauncher.dataset.windowState = getWindowIndicatorState(
     browserWindowState,
     browserFocused
+  );
+  wallpaperLauncher.dataset.windowState = getWindowIndicatorState(
+    wallpaperWindowState,
+    wallpaperFocused
   );
 }
 
@@ -608,6 +980,15 @@ function openBrowser(target = browserHomePage) {
   });
 }
 
+function openWallpaperWindow() {
+  minimizeOtherWindows("wallpaper");
+  wallpaperWindowState = "open";
+  wallpaperWindow.hidden = false;
+  setActiveWindow("wallpaper");
+  syncWindowState();
+  wallpaperWindow.focus({ preventScroll: true });
+}
+
 function bindBrowserFrameFocus() {
   if (!browserFrame) {
     return;
@@ -661,6 +1042,17 @@ function minimizeBrowser() {
   activateVisibleWindow();
 }
 
+function minimizeWallpaperWindow() {
+  wallpaperWindowState = "minimized";
+
+  if (activeWindow === "wallpaper") {
+    activeWindow = null;
+  }
+
+  wallpaperWindow.hidden = true;
+  activateVisibleWindow();
+}
+
 function closeBrowser() {
   browserWindowState = "closed";
   isBrowserMaximized = false;
@@ -676,11 +1068,30 @@ function closeBrowser() {
   activateVisibleWindow();
 }
 
+function closeWallpaperWindow() {
+  wallpaperWindowState = "closed";
+  isWallpaperMaximized = false;
+  wallpaperWindow.hidden = true;
+
+  if (activeWindow === "wallpaper") {
+    activeWindow = null;
+  }
+
+  activateVisibleWindow();
+}
+
 function toggleBrowserMaximize() {
   isBrowserMaximized = !isBrowserMaximized;
   setActiveWindow("browser");
   syncWindowState();
   browser.focus({ preventScroll: true });
+}
+
+function toggleWallpaperMaximize() {
+  isWallpaperMaximized = !isWallpaperMaximized;
+  setActiveWindow("wallpaper");
+  syncWindowState();
+  wallpaperWindow.focus({ preventScroll: true });
 }
 
 function syncCurrentLine() {
@@ -999,6 +1410,16 @@ browser.addEventListener("focus", () => {
     setActiveWindow("browser");
   }
 });
+wallpaperWindow.addEventListener("click", () => {
+  if (wallpaperWindowState === "open") {
+    setActiveWindow("wallpaper");
+  }
+});
+wallpaperWindow.addEventListener("focus", () => {
+  if (wallpaperWindowState === "open") {
+    setActiveWindow("wallpaper");
+  }
+});
 document.addEventListener("pointerdown", (event) => {
   if (terminalWindowState === "open" && terminal.contains(event.target)) {
     setActiveWindow("terminal");
@@ -1007,6 +1428,11 @@ document.addEventListener("pointerdown", (event) => {
 
   if (browserWindowState === "open" && browser.contains(event.target)) {
     setActiveWindow("browser");
+    return;
+  }
+
+  if (wallpaperWindowState === "open" && wallpaperWindow.contains(event.target)) {
+    setActiveWindow("wallpaper");
     return;
   }
 
@@ -1023,6 +1449,11 @@ document.addEventListener("focusin", (event) => {
     return;
   }
 
+  if (wallpaperWindow.contains(event.target)) {
+    setActiveWindow("wallpaper");
+    return;
+  }
+
   setActiveWindow(null);
 });
 window.addEventListener("focus", syncWindowState);
@@ -1031,12 +1462,22 @@ document.addEventListener("visibilitychange", syncWindowState);
 bindBrowserFrameFocus();
 terminalLauncher.addEventListener("click", openTerminal);
 browserLauncher.addEventListener("click", openBrowser);
+wallpaperLauncher.addEventListener("click", openWallpaperWindow);
 closeButton.addEventListener("click", closeTerminal);
 minimizeButton.addEventListener("click", minimizeTerminal);
 maximizeButton.addEventListener("click", toggleMaximize);
 browserCloseButton.addEventListener("click", closeBrowser);
 browserMinimizeButton.addEventListener("click", minimizeBrowser);
 browserMaximizeButton.addEventListener("click", toggleBrowserMaximize);
+wallpaperCloseButton.addEventListener("click", closeWallpaperWindow);
+wallpaperMinimizeButton.addEventListener("click", minimizeWallpaperWindow);
+wallpaperMaximizeButton.addEventListener("click", toggleWallpaperMaximize);
+wallpaperOptions.forEach((option) => {
+  option.addEventListener("click", () => {
+    setWallpaperPreference(option.dataset.wallpaper);
+    setActiveWindow("wallpaper");
+  });
+});
 themeToggle.addEventListener("click", () => {
   const resolvedTheme = getResolvedTheme();
   themePreference = resolvedTheme === "dark" ? "light" : "dark";

@@ -23,8 +23,14 @@
   --desktop-app-icon-background: rgba(255, 255, 255, 0.05);
   --desktop-app-terminal: #f5f5f5;
   --desktop-app-browser: #d6d6d6;
+  --desktop-app-wallpaper: #dfdfdf;
   --desktop-app-indicator-active: rgba(255, 255, 255, 0.94);
   --desktop-app-indicator-inactive: rgba(255, 255, 255, 0.28);
+  --wallpaper-window-background: rgba(8, 10, 11, 0.58);
+  --wallpaper-window-border: rgba(255, 255, 255, 0.1);
+  --wallpaper-option-background: rgba(255, 255, 255, 0.05);
+  --wallpaper-option-background-active: rgba(127, 227, 106, 0.14);
+  --wallpaper-option-border-active: rgba(127, 227, 106, 0.3);
   --font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono",
     Menlo, monospace;
 }
@@ -58,8 +64,14 @@
   --desktop-app-icon-background: rgba(15, 23, 42, 0.05);
   --desktop-app-terminal: #18212f;
   --desktop-app-browser: #202938;
+  --desktop-app-wallpaper: #202938;
   --desktop-app-indicator-active: rgba(24, 33, 47, 0.92);
   --desktop-app-indicator-inactive: rgba(24, 33, 47, 0.28);
+  --wallpaper-window-background: rgba(248, 249, 251, 0.6);
+  --wallpaper-window-border: rgba(15, 23, 42, 0.12);
+  --wallpaper-option-background: rgba(15, 23, 42, 0.04);
+  --wallpaper-option-background-active: rgba(47, 138, 57, 0.12);
+  --wallpaper-option-border-active: rgba(47, 138, 57, 0.28);
 }
 
 *,
@@ -92,11 +104,10 @@ body {
     linear-gradient(180deg, transparent, var(--wallpaper-overlay));
 }
 
-.wallpaper__image {
+.wallpaper__canvas {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
   transform: scale(1.02);
 }
 
@@ -201,8 +212,19 @@ body {
   fill: currentColor;
 }
 
+.desktop-app__icon--wallpaper {
+  color: var(--desktop-app-wallpaper);
+}
+
+.desktop-app__icon--wallpaper svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  fill: currentColor;
+}
+
 .terminal,
-.browser-window {
+.browser-window,
+.wallpaper-window {
   width: min(100%, 960px);
   height: clamp(32rem, 70vh, 52rem);
   max-height: calc(100vh - 7rem);
@@ -220,12 +242,14 @@ body {
 }
 
 .terminal[hidden],
-.browser-window[hidden] {
+.browser-window[hidden],
+.wallpaper-window[hidden] {
   display: none;
 }
 
 .terminal--maximized,
-.browser-window--maximized {
+.browser-window--maximized,
+.wallpaper-window--maximized {
   width: 100%;
   height: 100%;
   max-height: none;
@@ -233,13 +257,15 @@ body {
 }
 
 .terminal--focused,
-.browser-window--focused {
+.browser-window--focused,
+.wallpaper-window--focused {
   box-shadow: 0 24px 80px var(--terminal-shadow);
   z-index: 3;
 }
 
 .terminal:focus-visible,
-.browser-window:focus-visible {
+.browser-window:focus-visible,
+.wallpaper-window:focus-visible {
   outline: 2px solid rgba(163, 255, 176, 0.45);
   outline-offset: 4px;
 }
@@ -562,6 +588,98 @@ body {
   background: #ffffff;
 }
 
+.wallpaper-window {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 16%),
+    var(--wallpaper-window-background);
+  border-color: var(--wallpaper-window-border);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+}
+
+.wallpaper-window__chrome {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.wallpaper-window__body {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+.wallpaper-window__eyebrow,
+.wallpaper-window__title,
+.wallpaper-window__copy {
+  margin: 0;
+}
+
+.wallpaper-window__eyebrow {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+}
+
+.wallpaper-window__title {
+  margin-top: 0.2rem;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.wallpaper-window__copy {
+  margin-top: 0.4rem;
+  max-width: 36rem;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.wallpaper-window__options {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.wallpaper-option {
+  width: 100%;
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--terminal-border);
+  border-radius: 14px;
+  background: var(--wallpaper-option-background);
+  color: var(--text-primary);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    transform 140ms ease;
+}
+
+.wallpaper-option:hover,
+.wallpaper-option:focus-visible {
+  border-color: var(--wallpaper-option-border-active);
+  transform: translateY(-1px);
+}
+
+.wallpaper-option[aria-pressed="true"] {
+  border-color: var(--wallpaper-option-border-active);
+  background: var(--wallpaper-option-background-active);
+}
+
+.wallpaper-option__name {
+  font-size: 1rem;
+}
+
+.wallpaper-option__description {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
 .terminal__input {
   position: fixed;
   width: 1px;
@@ -603,13 +721,17 @@ body {
     right: 0.75rem;
   }
 
-  .terminal {
+  .terminal,
+  .browser-window,
+  .wallpaper-window {
     height: calc(100vh - 2rem);
     max-height: calc(100vh - 2rem);
     border-radius: 14px;
   }
 
-  .terminal--maximized {
+  .terminal--maximized,
+  .browser-window--maximized,
+  .wallpaper-window--maximized {
     width: 100%;
     height: 100%;
     max-height: none;
@@ -617,5 +739,9 @@ body {
 
   .terminal__body {
     padding: 0.5rem;
+  }
+
+  .wallpaper-window__body {
+    padding: 0.75rem;
   }
 }

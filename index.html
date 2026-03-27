@@ -12,7 +12,12 @@
   </head>
   <body>
     <div class="wallpaper" aria-hidden="true">
-      <img id="wallpaper-image" class="wallpaper__image" alt="" />
+      <svg
+        id="wallpaper-canvas"
+        class="wallpaper__canvas"
+        viewBox="0 0 1600 1000"
+        preserveAspectRatio="xMidYMid slice"
+      ></svg>
     </div>
 
     <main class="page-shell">
@@ -42,6 +47,21 @@
             <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
               <path
                 d="M12 24A12 12 0 1 0 12 0a12 12 0 0 0 0 24m.375-22.125v2.25a.375.375 0 0 1-.75 0v-2.25a.375.375 0 0 1 .75 0m0 18v2.25a.375.375 0 1 1-.75 0v-2.25a.375.375 0 1 1 .75 0M6.75 2.907a.375.375 0 0 1 .513.137l1.125 1.95a.375.375 0 0 1-.651.375L6.612 3.42a.375.375 0 0 1 .138-.512m9 15.588a.375.375 0 0 1 .512.138l1.125 1.948a.375.375 0 1 1-.648.375l-1.125-1.95a.375.375 0 0 1 .136-.51ZM3.42 6.612l1.947 1.125a.375.375 0 0 1-.375.651L3.044 7.263a.375.375 0 0 1 .375-.651Zm15.588 9 1.948 1.125a.375.375 0 1 1-.375.651l-1.95-1.125a.375.375 0 0 1 .377-.651ZM1.5 12a.375.375 0 0 1 .375-.375h2.25a.375.375 0 0 1 0 .75h-2.25A.375.375 0 0 1 1.5 12m18 0a.375.375 0 0 1 .375-.375h2.25a.375.375 0 1 1 0 .75h-2.25A.375.375 0 0 1 19.5 12M3.045 16.738l1.947-1.125a.375.375 0 0 1 .375.648l-1.948 1.125a.375.375 0 0 1-.375-.648Zm15.588-9 1.948-1.125a.375.375 0 1 1 .375.649l-1.95 1.125a.375.375 0 0 1-.373-.649ZM6.75 21.093a.375.375 0 0 1-.138-.512l1.125-1.95a.375.375 0 0 1 .651.375l-1.125 1.95a.375.375 0 0 1-.513.137m9-15.588a.375.375 0 0 1-.136-.513l1.125-1.948a.375.375 0 1 1 .648.375l-1.125 1.95a.375.375 0 0 1-.512.136ZM9.741 2.123l.195.725a.375.375 0 1 1-.724.195l-.195-.725a.375.375 0 0 1 .724-.195m5.049 18.835.195.725a.375.375 0 1 1-.724.195l-.195-.725a.375.375 0 1 1 .724-.195M4.575 4.575a.375.375 0 0 1 .53 0l.53.53a.375.375 0 0 1-.53.53l-.53-.53a.375.375 0 0 1 0-.53m13.789 13.789a.375.375 0 0 1 .53 0l.53.53a.375.375 0 1 1-.53.53l-.53-.53a.375.375 0 0 1 0-.53M2.318 9.017l.725.195a.375.375 0 1 1-.195.724l-.725-.195a.375.375 0 1 1 .195-.724m18.835 5.048.725.195a.375.375 0 1 1-.195.724l-.725-.195a.375.375 0 1 1 .195-.724m-19.295.654a.375.375 0 0 1 .264-.459l.725-.195a.375.375 0 0 1 .195.724l-.725.195a.375.375 0 0 1-.459-.265m18.835-5.048a.375.375 0 0 1 .264-.459l.725-.195a.375.375 0 1 1 .195.724l-.725.195a.375.375 0 0 1-.459-.265M4.568 19.416a.45.45 0 0 1-.044-.564l5.847-8.388a.45.45 0 0 1 .093-.093l8.403-5.826a.417.417 0 0 1 .587.587l-5.826 8.403a.45.45 0 0 1-.093.093l-8.388 5.847a.45.45 0 0 1-.579-.051zm4.715 2.725a.375.375 0 0 1-.264-.459l.194-.725a.375.375 0 1 1 .724.195l-.195.725a.375.375 0 0 1-.459.264m5.047-18.835a.375.375 0 0 1-.265-.459l.195-.725a.375.375 0 1 1 .724.195l-.195.725a.375.375 0 0 1-.459.264"
+              />
+            </svg>
+          </span>
+        </button>
+
+        <button
+          id="wallpaper-launcher"
+          class="desktop-app"
+          type="button"
+          aria-label="Open wallpapers"
+        >
+          <span class="desktop-app__icon desktop-app__icon--wallpaper" aria-hidden="true">
+            <svg viewBox="0 0 1024 1024" role="img" aria-hidden="true">
+              <path
+                d="M96 896a32 32 0 0 1-32-32V160a32 32 0 0 1 32-32h832a32 32 0 0 1 32 32v704a32 32 0 0 1-32 32H96zm315.52-228.48-68.928-68.928a32 32 0 0 0-45.248 0L128 768.064h778.688l-242.112-290.56a32 32 0 0 0-49.216 0L458.752 665.408a32 32 0 0 1-47.232 2.112zM256 384a96 96 0 1 0 192.064-.064A96 96 0 0 0 256 384z"
               />
             </svg>
           </span>
@@ -144,6 +164,96 @@
             class="browser__frame"
             title="Browser content"
           ></iframe>
+        </div>
+      </section>
+
+      <section
+        id="wallpaper-window"
+        class="browser-window wallpaper-window"
+        aria-label="Wallpaper window"
+        tabindex="0"
+        hidden
+      >
+        <div class="terminal__chrome browser__chrome wallpaper-window__chrome">
+          <div class="terminal__controls">
+            <button
+              id="wallpaper-close"
+              class="terminal__dot terminal__dot--close"
+              type="button"
+              aria-label="Close wallpapers"
+            >
+              <span class="terminal__dot-icon" aria-hidden="true">x</span>
+            </button>
+            <button
+              id="wallpaper-minimize"
+              class="terminal__dot terminal__dot--minimize"
+              type="button"
+              aria-label="Minimize wallpapers"
+            >
+              <span class="terminal__dot-icon" aria-hidden="true">-</span>
+            </button>
+            <button
+              id="wallpaper-maximize"
+              class="terminal__dot terminal__dot--maximize"
+              type="button"
+              aria-label="Maximize wallpapers"
+            >
+              <span class="terminal__dot-icon" aria-hidden="true">□</span>
+            </button>
+          </div>
+
+          <div class="browser__address-shell">
+            <div class="browser__address" aria-label="Wallpaper chooser">wallpapers</div>
+          </div>
+        </div>
+
+        <div class="wallpaper-window__body">
+          <div class="wallpaper-window__intro">
+            <p class="wallpaper-window__eyebrow">DESKTOP</p>
+            <h2 class="wallpaper-window__title">Wallpapers</h2>
+            <p class="wallpaper-window__copy">
+              Pick an animated background. This window stays translucent so the result is visible
+              while you switch.
+            </p>
+          </div>
+
+          <div class="wallpaper-window__options" role="list">
+            <button
+              class="wallpaper-option"
+              type="button"
+              data-wallpaper="default"
+              aria-pressed="false"
+            >
+              <span class="wallpaper-option__name">Lines</span>
+              <span class="wallpaper-option__description">
+                Angular strokes that slowly expand and contract.
+              </span>
+            </button>
+
+            <button
+              class="wallpaper-option"
+              type="button"
+              data-wallpaper="bubbles"
+              aria-pressed="false"
+            >
+              <span class="wallpaper-option__name">Bubbles</span>
+              <span class="wallpaper-option__description">
+                Soft bubbles rise from the bottom, with occasional mid-screen pops.
+              </span>
+            </button>
+
+            <button
+              class="wallpaper-option"
+              type="button"
+              data-wallpaper="rain"
+              aria-pressed="false"
+            >
+              <span class="wallpaper-option__name">Rain</span>
+              <span class="wallpaper-option__description">
+                Long rain streaks fall top-down with subtle changes in drop shape.
+              </span>
+            </button>
+          </div>
         </div>
       </section>
 
