@@ -5,6 +5,7 @@ const pageShell = document.querySelector(".page-shell");
 const terminalBody = document.querySelector(".terminal__body");
 const terminalInput = document.querySelector("#terminal-input");
 const terminalText = document.querySelector("#terminal-text");
+const terminalCursor = document.querySelector(".terminal__cursor");
 const terminalHistory = document.querySelector("#terminal-history");
 const introLine = document.querySelector(".terminal__line--muted");
 const promptElements = document.querySelectorAll(".terminal__prompt");
@@ -1035,7 +1036,7 @@ function resetTerminalState({ shouldBootSequence = false } = {}) {
   setInteractiveState(!shouldBootSequence);
   terminalHistory.replaceChildren();
   terminalInput.value = "";
-  terminalText.textContent = "";
+  renderCurrentLine("");
   introLine.hidden = false;
   resetCommandHistory();
   syncPrompt();
@@ -1281,13 +1282,27 @@ function toggleWallpaperMaximize() {
   wallpaperWindow.focus({ preventScroll: true });
 }
 
+function renderCurrentLine(value, caretPosition = String(value ?? "").length) {
+  const text = String(value ?? "");
+  const clampedCaret = Math.max(0, Math.min(text.length, caretPosition));
+  const before = text.slice(0, clampedCaret);
+  const currentCharacter = text.slice(clampedCaret, clampedCaret + 1);
+  const after = text.slice(clampedCaret + (currentCharacter ? 1 : 0));
+
+  terminalText.textContent = "";
+  terminalText.append(document.createTextNode(before));
+  terminalCursor.textContent = currentCharacter || "\u00a0";
+  terminalText.append(terminalCursor, document.createTextNode(after));
+}
+
 function syncCurrentLine() {
+  renderCurrentLine(terminalInput.value, terminalInput.selectionStart ?? terminalInput.value.length);
+
   if (!isInteractive) {
     return;
   }
 
   isPinnedToBottom = true;
-  terminalText.textContent = terminalInput.value;
   scrollToBottom();
 }
 
@@ -1532,7 +1547,7 @@ function submitCommand(rawValue, { recordHistory = true } = {}) {
   handleCommandResult(result);
   commitHistory();
   terminalInput.value = "";
-  terminalText.textContent = "";
+  renderCurrentLine("");
 }
 
 function handleCommandResult(result) {
@@ -1563,7 +1578,7 @@ function completeBootSequence(sequenceToken) {
   }
 
   terminalInput.value = bootCommand;
-  terminalText.textContent = terminalInput.value;
+  renderCurrentLine(terminalInput.value, terminalInput.value.length);
   submitCommand(bootCommand, { recordHistory: false });
   setInteractiveState(true);
 
@@ -1577,7 +1592,7 @@ async function runBootSequence() {
   needsBootSequence = false;
   setInteractiveState(false);
   terminalInput.value = "";
-  terminalText.textContent = "";
+  renderCurrentLine("");
   focusInput();
 
   const stepDuration = bootDurationMs / bootCommand.length;
@@ -1593,7 +1608,7 @@ async function runBootSequence() {
     }
 
     terminalInput.value += character;
-    terminalText.textContent = terminalInput.value;
+    renderCurrentLine(terminalInput.value, terminalInput.value.length);
     scrollToBottom();
     await sleep(stepDuration);
   }
@@ -1757,6 +1772,9 @@ themeToggle.addEventListener("click", () => {
 });
 
 terminalInput.addEventListener("input", syncCurrentLine);
+terminalInput.addEventListener("click", syncCurrentLine);
+terminalInput.addEventListener("select", syncCurrentLine);
+terminalInput.addEventListener("keyup", syncCurrentLine);
 
 terminalInput.addEventListener("keydown", (event) => {
   if (!isInteractive) {

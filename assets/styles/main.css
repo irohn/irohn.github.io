@@ -556,10 +556,12 @@ body {
 }
 
 .terminal__cursor {
-  width: 0.62rem;
+  display: inline-block;
+  min-width: 0.62rem;
   height: 1.2em;
-  margin-left: 0.12rem;
+  margin-left: 0;
   background: var(--cursor-color);
+  color: var(--terminal-background);
   transform: translateY(0.12em);
   animation: blink 1.1s steps(1, end) infinite;
 }
