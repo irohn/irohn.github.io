@@ -41,17 +41,16 @@
         --links-kicker: #657285;
       }
 
+      html,
       body {
-        min-height: 100vh;
+        min-height: 100%;
         margin: 0;
         background: var(--links-background) !important;
         background-image: none !important;
-        color: var(--links-text);
       }
 
-      html {
-        background: var(--links-background) !important;
-        background-image: none !important;
+      body {
+        color: var(--links-text);
       }
 
       main,
@@ -71,10 +70,6 @@
         border: 1px solid var(--links-border);
         border-radius: 1rem;
         box-shadow: 0 18px 48px var(--links-shadow);
-      }
-
-      .links-title {
-        letter-spacing: 0.04em;
       }
 
       .links-list .list-group-item {
@@ -112,8 +107,7 @@
         color: var(--links-description);
       }
 
-      .links-kicker,
-      .links-subtitle {
+      .links-kicker {
         color: var(--links-kicker) !important;
       }
     </style>
@@ -194,8 +188,7 @@
       const themeStorageKey = "irohn-theme-preference";
 
       function applyTheme(theme) {
-        const resolvedTheme = theme === "light" ? "light" : "dark";
-        document.documentElement.dataset.theme = resolvedTheme;
+        document.documentElement.dataset.theme = theme === "light" ? "light" : "dark";
       }
 
       function syncThemeFromParent() {

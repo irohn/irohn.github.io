@@ -156,7 +156,14 @@
           </div>
 
           <div class="browser__address-shell">
-            <div id="browser-address" class="browser__address" aria-label="Browser address"></div>
+            <button
+              id="browser-address"
+              class="browser__address"
+              type="button"
+              aria-label="Browser pages"
+              aria-expanded="false"
+            ></button>
+            <div id="browser-page-menu" class="browser__page-menu" hidden></div>
           </div>
         </div>
 
@@ -209,90 +216,53 @@
 
         <div class="wallpaper-window__body">
           <div class="wallpaper-window__intro">
-            <p class="wallpaper-window__eyebrow">DESKTOP</p>
-            <h2 class="wallpaper-window__title">Appearance</h2>
-            <p class="wallpaper-window__copy">
-              Tune the wallpaper and accent color. This window stays translucent so the result is
-              visible while you switch.
-            </p>
+            <p class="wallpaper-window__eyebrow">APPEARANCE</p>
           </div>
 
-          <div class="wallpaper-window__options" role="list">
-            <button
-              class="wallpaper-option"
-              type="button"
-              data-wallpaper="default"
-              aria-pressed="false"
-            >
-              <span class="wallpaper-option__name">Lines</span>
-              <span class="wallpaper-option__description">
-                Angular strokes that slowly expand and contract.
-              </span>
-            </button>
-
-            <button
-              class="wallpaper-option"
-              type="button"
-              data-wallpaper="bubbles"
-              aria-pressed="false"
-            >
-              <span class="wallpaper-option__name">Bubbles</span>
-              <span class="wallpaper-option__description">
-                Soft bubbles rise from the bottom, with occasional mid-screen pops.
-              </span>
-            </button>
-
-            <button
-              class="wallpaper-option"
-              type="button"
-              data-wallpaper="rain"
-              aria-pressed="false"
-            >
-              <span class="wallpaper-option__name">Rain</span>
-              <span class="wallpaper-option__description">
-                Long rain streaks fall top-down with subtle changes in drop shape.
-              </span>
-            </button>
+          <div class="wallpaper-window__control">
+            <span class="wallpaper-window__label">Wallpaper</span>
+            <div class="wallpaper-window__wallpapers" role="list">
+              <button class="wallpaper-preset" type="button" data-wallpaper="default" aria-pressed="false">
+                <span class="wallpaper-preset__preview wallpaper-preset__preview--lines"></span>
+                <span class="wallpaper-preset__name">Lines</span>
+              </button>
+              <button class="wallpaper-preset" type="button" data-wallpaper="bubbles" aria-pressed="false">
+                <span class="wallpaper-preset__preview wallpaper-preset__preview--bubbles"></span>
+                <span class="wallpaper-preset__name">Bubbles</span>
+              </button>
+              <button class="wallpaper-preset" type="button" data-wallpaper="rain" aria-pressed="false">
+                <span class="wallpaper-preset__preview wallpaper-preset__preview--rain"></span>
+                <span class="wallpaper-preset__name">Rain</span>
+              </button>
+            </div>
           </div>
 
-          <div class="wallpaper-window__accent">
-            <p class="wallpaper-window__section-title">Accent Color</p>
-            <p class="wallpaper-window__section-copy">
-              Pick a preset accent used by the wallpapers and desktop UI.
-            </p>
-
-            <div class="wallpaper-window__accent-presets" role="list">
+          <div class="wallpaper-window__control">
+            <span class="wallpaper-window__label">Accent</span>
+            <div class="wallpaper-window__accent-swatches" role="list">
               <button class="accent-preset" type="button" data-accent="white" aria-pressed="false">
-                <span class="accent-preset__swatch accent-preset__swatch--white"></span>
-                <span class="accent-preset__label">White</span>
+                <span class="sr-only">White</span>
               </button>
               <button class="accent-preset" type="button" data-accent="red" aria-pressed="false">
-                <span class="accent-preset__swatch accent-preset__swatch--red"></span>
-                <span class="accent-preset__label">Red</span>
+                <span class="sr-only">Red</span>
               </button>
               <button class="accent-preset" type="button" data-accent="green" aria-pressed="false">
-                <span class="accent-preset__swatch accent-preset__swatch--green"></span>
-                <span class="accent-preset__label">Green</span>
+                <span class="sr-only">Green</span>
               </button>
               <button class="accent-preset" type="button" data-accent="blue" aria-pressed="false">
-                <span class="accent-preset__swatch accent-preset__swatch--blue"></span>
-                <span class="accent-preset__label">Blue</span>
+                <span class="sr-only">Blue</span>
               </button>
               <button class="accent-preset" type="button" data-accent="yellow" aria-pressed="false">
-                <span class="accent-preset__swatch accent-preset__swatch--yellow"></span>
-                <span class="accent-preset__label">Yellow</span>
+                <span class="sr-only">Yellow</span>
               </button>
               <button class="accent-preset" type="button" data-accent="cyan" aria-pressed="false">
-                <span class="accent-preset__swatch accent-preset__swatch--cyan"></span>
-                <span class="accent-preset__label">Cyan</span>
+                <span class="sr-only">Cyan</span>
               </button>
               <button class="accent-preset" type="button" data-accent="purple" aria-pressed="false">
-                <span class="accent-preset__swatch accent-preset__swatch--purple"></span>
-                <span class="accent-preset__label">Purple</span>
+                <span class="sr-only">Purple</span>
               </button>
               <button class="accent-preset" type="button" data-accent="magenta" aria-pressed="false">
-                <span class="accent-preset__swatch accent-preset__swatch--magenta"></span>
-                <span class="accent-preset__label">Magenta</span>
+                <span class="sr-only">Magenta</span>
               </button>
             </div>
           </div>

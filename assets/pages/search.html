@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Search</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --search-background: #0e0e10;
+        --search-card: rgba(20, 20, 22, 0.92);
+        --search-border: rgba(255, 255, 255, 0.08);
+        --search-text: #f1f1f1;
+        --search-muted: #9d9d9d;
+        --search-input: rgba(255, 255, 255, 0.05);
+        --search-button: #d8d8d8;
+        --search-button-text: #141414;
+      }
+
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --search-background: #eef1f5;
+        --search-card: rgba(248, 249, 251, 0.96);
+        --search-border: rgba(15, 23, 42, 0.08);
+        --search-text: #18212f;
+        --search-muted: #657285;
+        --search-input: rgba(15, 23, 42, 0.05);
+        --search-button: #202938;
+        --search-button-text: #f8f9fb;
+      }
+
+      html,
+      body {
+        height: 100%;
+        min-height: 100vh;
+        margin: 0;
+        background: var(--search-background);
+        color: var(--search-text);
+        font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+          monospace;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+      }
+
+      .search-shell {
+        width: min(100% - 2rem, 32rem);
+        padding: 1rem 0;
+        text-align: center;
+      }
+
+      .search-title,
+      .search-copy {
+        margin: 0;
+      }
+
+      .search-copy {
+        margin-top: 0.45rem;
+        color: var(--search-muted);
+        font-size: 0.9rem;
+      }
+
+      .search-form {
+        margin-top: 1.25rem;
+        display: grid;
+        gap: 0.8rem;
+        justify-items: center;
+      }
+
+      .search-input {
+        width: 100%;
+        height: 2.8rem;
+        padding: 0 0.95rem;
+        border: 1px solid var(--search-border);
+        border-radius: 0.9rem;
+        background: var(--search-input);
+        color: var(--search-text);
+        font: inherit;
+      }
+
+      .search-button {
+        min-width: 8.5rem;
+        height: 2.7rem;
+        padding: 0 1rem;
+        border: 0;
+        border-radius: 999px;
+        background: var(--search-button);
+        color: var(--search-button-text);
+        font: inherit;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="search-shell">
+      <p class="search-copy">Search Google in a new tab.</p>
+
+      <form class="search-form" id="search-form">
+        <input
+          id="search-input"
+          class="search-input"
+          type="text"
+          name="q"
+          autocomplete="off"
+          placeholder="Search the web"
+        />
+        <button class="search-button" type="submit">Search</button>
+      </form>
+    </main>
+
+    <script>
+      const themeStorageKey = "irohn-theme-preference";
+
+      function applyTheme(theme) {
+        document.documentElement.dataset.theme = theme === "light" ? "light" : "dark";
+      }
+
+      function syncThemeFromParent() {
+        try {
+          const parentTheme =
+            window.parent?.document?.documentElement?.dataset?.theme ||
+            window.localStorage.getItem(themeStorageKey) ||
+            "dark";
+          applyTheme(parentTheme);
+        } catch (_error) {
+          applyTheme(window.localStorage.getItem(themeStorageKey) || "dark");
+        }
+      }
+
+      syncThemeFromParent();
+      window.addEventListener("storage", (event) => {
+        if (event.key === themeStorageKey) {
+          applyTheme(event.newValue || "dark");
+        }
+      });
+
+      try {
+        const parentRoot = window.parent?.document?.documentElement;
+
+        if (parentRoot) {
+          const observer = new MutationObserver(() => {
+            syncThemeFromParent();
+          });
+
+          observer.observe(parentRoot, {
+            attributes: true,
+            attributeFilter: ["data-theme"],
+          });
+        }
+      } catch (_error) {
+        // Ignore access issues.
+      }
+
+      document.querySelector("#search-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const query = document.querySelector("#search-input").value.trim();
+
+        if (!query) {
+          return;
+        }
+
+        window.open(
+          `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      });
+    </script>
+  </body>
+</html>

@@ -17,6 +17,7 @@ const minimizeButton = document.querySelector("#terminal-minimize");
 const maximizeButton = document.querySelector("#terminal-maximize");
 const browser = document.querySelector("#browser-window");
 const browserAddress = document.querySelector("#browser-address");
+const browserPageMenu = document.querySelector("#browser-page-menu");
 const browserFrame = document.querySelector("#browser-frame");
 const browserCloseButton = document.querySelector("#browser-close");
 const browserMinimizeButton = document.querySelector("#browser-minimize");
@@ -25,13 +26,25 @@ const wallpaperWindow = document.querySelector("#wallpaper-window");
 const wallpaperCloseButton = document.querySelector("#wallpaper-close");
 const wallpaperMinimizeButton = document.querySelector("#wallpaper-minimize");
 const wallpaperMaximizeButton = document.querySelector("#wallpaper-maximize");
-const wallpaperOptions = document.querySelectorAll(".wallpaper-option");
+const wallpaperPresetButtons = document.querySelectorAll(".wallpaper-preset");
 const accentPresetButtons = document.querySelectorAll(".accent-preset");
 const themeToggle = document.querySelector("#theme-toggle");
 
 const siteName = "irohn.net";
 const homeDirectory = "/home/guest";
-const browserHomePage = "links.html";
+const browserPages = [
+  {
+    id: "links",
+    label: "Links",
+    path: "assets/pages/links.html",
+  },
+  {
+    id: "search",
+    label: "Search",
+    path: "assets/pages/search.html",
+  },
+];
+const browserHomePage = browserPages[0].path;
 const unknownCommandMessage =
   "Command not found. Type `help commands` to see available commands.";
 const permissionDeniedMessage =
@@ -87,6 +100,7 @@ let isTerminalMaximized = false;
 let isBrowserMaximized = false;
 let isWallpaperMaximized = false;
 let browserNavigationToken = 0;
+let currentBrowserPage = browserHomePage;
 
 const fileSystem = createDirectory({
   home: createDirectory({
@@ -102,8 +116,11 @@ const fileSystem = createDirectory({
       "CNAME": createFile("irohn.net"),
       "README.md": createFile("Personal website repository"),
       "index.html": createFile("Static site entrypoint"),
-      "links.html": createFile("Browser home page with social links"),
       assets: createDirectory({
+        pages: createDirectory({
+          "links.html": createFile("Browser home page with social links"),
+          "search.html": createFile("Local search page"),
+        }),
         styles: createDirectory({
           "main.css": createFile("Main site stylesheet"),
         }),
@@ -405,37 +422,48 @@ function createSvgElement(tagName, attributes = {}) {
   return element;
 }
 
-function appendAnimate(element, attributeName, values, duration) {
+function appendAnimate(element, attributeName, values, duration, extraAttributes = {}) {
   element.append(
     createSvgElement("animate", {
       attributeName,
       values,
       dur: duration,
       repeatCount: "indefinite",
+      ...extraAttributes,
     })
   );
 }
 
 function getWallpaperPalette(theme) {
-  const accentColor = accentPresets[accentPreset] ?? accentPresets.white;
+  const accentColor = getResolvedAccentColor(theme);
 
   if (theme === "light") {
     return {
       background: "#f3f5f8",
-      accent: "#1e2530",
-      muted: mixHexColors(accentColor, "#456c92", 0.28),
-      soft: mixHexColors(accentColor, "#f3f5f8", 0.18),
+      accent: accentColor,
+      muted: mixHexColors(accentColor, "#456c92", 0.24),
+      soft: mixHexColors(accentColor, "#f3f5f8", 0.4),
       haze: "rgba(255, 255, 255, 0.28)",
     };
   }
 
   return {
     background: "#101112",
-    accent: "#eef3f7",
-    muted: mixHexColors(accentColor, "#7fa8c9", 0.32),
-    soft: mixHexColors(accentColor, "#101112", 0.14),
+    accent: accentColor,
+    muted: mixHexColors(accentColor, "#7fa8c9", 0.24),
+    soft: mixHexColors(accentColor, "#101112", 0.42),
     haze: "rgba(255, 255, 255, 0.14)",
   };
+}
+
+function getResolvedAccentColor(theme = getResolvedTheme()) {
+  const accentColor = accentPresets[accentPreset] ?? accentPresets.white;
+
+  if (theme === "light" && accentPreset === "white") {
+    return "#202938";
+  }
+
+  return accentColor;
 }
 
 function hexToRgb(hexColor) {
@@ -482,7 +510,7 @@ function syncAccentControls() {
 }
 
 function applyAccentTheme() {
-  const accentColor = accentPresets[accentPreset] ?? accentPresets.white;
+  const accentColor = getResolvedAccentColor();
   const accentRgb = hexToRgb(accentColor) ?? { red: 245, green: 245, blue: 245 };
 
   document.documentElement.style.setProperty("--window-neutral-accent", accentColor);
@@ -495,6 +523,19 @@ function applyAccentTheme() {
     `rgba(${accentRgb.red}, ${accentRgb.green}, ${accentRgb.blue}, 0.3)`
   );
   document.documentElement.style.setProperty("--desktop-app-indicator-active", accentColor);
+  document.documentElement.style.setProperty("--wallpaper-preview-accent", accentColor);
+  document.documentElement.style.setProperty(
+    "--wallpaper-preview-accent-strong",
+    `rgba(${accentRgb.red}, ${accentRgb.green}, ${accentRgb.blue}, 0.42)`
+  );
+  document.documentElement.style.setProperty(
+    "--wallpaper-preview-accent-soft",
+    `rgba(${accentRgb.red}, ${accentRgb.green}, ${accentRgb.blue}, 0.22)`
+  );
+  document.documentElement.style.setProperty(
+    "--wallpaper-preview-accent-faint",
+    `rgba(${accentRgb.red}, ${accentRgb.green}, ${accentRgb.blue}, 0.12)`
+  );
 }
 
 function renderLineWallpaper(root, theme) {
@@ -573,6 +614,9 @@ function renderBubbleWallpaper(root, theme) {
     const bubbleColor = index % 2 === 0 ? palette.muted : palette.soft;
     const gradientId = `bubble-gradient-${theme}-${index}`;
     const motionClass = radius <= 16 ? "small" : radius <= 22 ? "medium" : "large";
+    const riseSeconds = duration / 1.5;
+    const riseDuration = riseSeconds.toFixed(2);
+    const risePhaseOffset = `-${((index * riseSeconds) / bubbles.length).toFixed(2)}s`;
     const wobbleDuration =
       motionClass === "small"
         ? (1.85 + (index % 3) * 0.16).toFixed(2)
@@ -585,12 +629,6 @@ function renderBubbleWallpaper(root, theme) {
         : motionClass === "medium"
           ? 0.9 + (index % 3) * 0.3
           : 1.3 + (index % 4) * 0.35;
-    const angleDrift =
-      motionClass === "small"
-        ? (index % 2 === 0 ? 1 : -1) * (0.8 + (index % 2) * 0.35)
-        : motionClass === "medium"
-          ? (index % 2 === 0 ? 1 : -1) * (1.8 + (index % 3) * 0.7)
-          : (index % 2 === 0 ? 1 : -1) * (2.8 + (index % 4) * 0.9);
     const gradient = createSvgElement("radialGradient", {
       id: gradientId,
       cx: `${32 + (index % 4) * 4}%`,
@@ -634,8 +672,6 @@ function renderBubbleWallpaper(root, theme) {
             ? radius * 1.0
             : radius * 1.01,
       fill: `url(#${gradientId})`,
-      stroke: palette.accent,
-      "stroke-width": 1.15 + (index % 3) * 0.28,
       opacity: 0.52,
     });
     appendAnimate(
@@ -658,21 +694,20 @@ function renderBubbleWallpaper(root, theme) {
           : `${(radius * 0.95).toFixed(2)};${(radius * 0.9).toFixed(2)};${(radius * 1.0).toFixed(2)};${(radius * 0.93).toFixed(2)};${(radius * 0.95).toFixed(2)}`,
       `${(Number(wobbleDuration) * 0.92).toFixed(2)}s`
     );
-    appendAnimate(bubble, "cy", `${cy};${peak};-140`, `${duration}s`);
-    bubble.append(
-      createSvgElement("animate", {
-        attributeName: "cx",
-        values: `${cx};${cx + angleDrift}`,
-        dur: `${duration}s`,
-        repeatCount: "indefinite",
-        calcMode: "linear",
-      })
-    );
+    appendAnimate(bubble, "cy", `${cy};-140`, `${riseDuration}s`, {
+      begin: risePhaseOffset,
+      calcMode: "linear",
+    });
     appendAnimate(
       bubble,
       "opacity",
       `0;0.56;${index % 10 === 0 ? 0.18 : 0.56};0`,
-      `${duration}s`
+      `${riseDuration}s`,
+      {
+        begin: risePhaseOffset,
+        calcMode: "linear",
+        keyTimes: "0;0.08;0.94;1",
+      }
     );
     bubble.append(
       createSvgElement("animateTransform", {
@@ -700,10 +735,11 @@ function renderBubbleWallpaper(root, theme) {
           fill: palette.accent,
           opacity: 0,
         });
-        appendAnimate(particle, "cx", `${cx};${px}`, "1.2s");
-        appendAnimate(particle, "cy", `${peak};${py}`, "1.2s");
-        appendAnimate(particle, "opacity", "0;0;0.7;0", "1.2s");
-        appendAnimate(particle, "r", "1.8;1.3;0.2", "1.2s");
+        const popBegin = `-${((((index * riseSeconds) / bubbles.length) + riseSeconds * 0.9) % riseSeconds).toFixed(2)}s`;
+        appendAnimate(particle, "cx", `${cx};${px}`, "1.2s", { begin: popBegin });
+        appendAnimate(particle, "cy", `${peak};${py}`, "1.2s", { begin: popBegin });
+        appendAnimate(particle, "opacity", "0;0;0.7;0", "1.2s", { begin: popBegin });
+        appendAnimate(particle, "r", "1.8;1.3;0.2", "1.2s", { begin: popBegin });
         particlesGroup.append(particle);
       }
     }
@@ -762,8 +798,8 @@ function renderRainWallpaper(root, theme) {
 function syncWallpaperOptions() {
   const wallpaperType = getResolvedWallpaper();
 
-  wallpaperOptions.forEach((option) => {
-    option.setAttribute("aria-pressed", String(option.dataset.wallpaper === wallpaperType));
+  wallpaperPresetButtons.forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.wallpaper === wallpaperType));
   });
 }
 
@@ -988,41 +1024,54 @@ function isExternalBrowserTarget(target) {
   return /^https?:\/\//i.test(target);
 }
 
-function normalizeBrowserTarget(value) {
-  const trimmedValue = String(value ?? "").trim();
-
-  if (!trimmedValue) {
-    return browserHomePage;
-  }
-
-  if (
-    trimmedValue.startsWith("/") ||
-    trimmedValue.startsWith("./") ||
-    trimmedValue.startsWith("../")
-  ) {
-    return trimmedValue;
-  }
-
-  if (!trimmedValue.includes("://")) {
-    if (
-      /^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/.*)?$/i.test(trimmedValue) &&
-      !/\.html?(\/.*)?$/i.test(trimmedValue)
-    ) {
-      return `https://${trimmedValue}`;
-    }
-
-    return trimmedValue;
-  }
-
-  return trimmedValue;
+function getBrowserPageByPath(path) {
+  return browserPages.find((page) => page.path === path) ?? null;
 }
 
-function navigateBrowser(rawTarget = browserAddress.textContent) {
-  const target = normalizeBrowserTarget(rawTarget);
-  const navigationToken = ++browserNavigationToken;
+function closeBrowserPageMenu() {
+  browserPageMenu.hidden = true;
+  browserAddress.setAttribute("aria-expanded", "false");
+}
 
-  browserAddress.textContent = target;
+function syncBrowserPageMenu() {
+  browserPageMenu.replaceChildren();
+
+  browserPages.forEach((page) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "browser__page-option";
+    item.dataset.path = page.path;
+    item.setAttribute("aria-current", String(page.path === currentBrowserPage ? "page" : "false"));
+    item.innerHTML = `<span class="browser__page-option-name">${page.label}</span><span class="browser__page-option-path">${page.path}</span>`;
+    browserPageMenu.append(item);
+  });
+}
+
+function openBrowserPageMenu() {
+  syncBrowserPageMenu();
+  browserPageMenu.hidden = false;
+  browserAddress.setAttribute("aria-expanded", "true");
+}
+
+function toggleBrowserPageMenu() {
+  if (browserPageMenu.hidden) {
+    openBrowserPageMenu();
+    return;
+  }
+
+  closeBrowserPageMenu();
+}
+
+function navigateBrowser(rawTarget = currentBrowserPage) {
+  const target = getBrowserPageByPath(rawTarget)?.path ?? browserHomePage;
+  const navigationToken = ++browserNavigationToken;
+  const page = getBrowserPageByPath(target);
+
+  currentBrowserPage = target;
+  browserAddress.textContent = page?.label ?? target;
   browserFrame.src = target;
+  syncBrowserPageMenu();
+  closeBrowserPageMenu();
 
   if (!isExternalBrowserTarget(target)) {
     return;
@@ -1050,9 +1099,15 @@ function navigateBrowser(rawTarget = browserAddress.textContent) {
   );
 }
 
-function openBrowser(target = browserHomePage) {
+function openBrowser(target) {
   const initialTarget =
-    typeof target === "string" || target == null ? target ?? browserHomePage : browserHomePage;
+    typeof target === "string"
+      ? target
+      : target == null
+        ? browserWindowState === "minimized"
+          ? currentBrowserPage
+          : browserHomePage
+        : browserHomePage;
 
   minimizeOtherWindows("browser");
   browserWindowState = "open";
@@ -1148,6 +1203,8 @@ function closeBrowser() {
   browserNavigationToken += 1;
   browser.hidden = true;
   browserAddress.textContent = "";
+  currentBrowserPage = browserHomePage;
+  closeBrowserPageMenu();
   browserFrame.removeAttribute("src");
 
   if (activeWindow === "browser") {
@@ -1451,6 +1508,21 @@ function focusInput() {
   terminalInput.focus({ preventScroll: true });
 }
 
+function completeBootSequence(sequenceToken) {
+  if (sequenceToken !== bootSequenceToken) {
+    return;
+  }
+
+  terminalInput.value = bootCommand;
+  terminalText.textContent = terminalInput.value;
+  submitCommand(bootCommand);
+  setInteractiveState(true);
+
+  if (!terminal.hidden) {
+    focusInput();
+  }
+}
+
 async function runBootSequence() {
   const sequenceToken = ++bootSequenceToken;
   needsBootSequence = false;
@@ -1462,7 +1534,12 @@ async function runBootSequence() {
   const stepDuration = bootDurationMs / bootCommand.length;
 
   for (const character of bootCommand) {
-    if (sequenceToken !== bootSequenceToken || terminal.hidden) {
+    if (sequenceToken !== bootSequenceToken) {
+      return;
+    }
+
+    if (terminal.hidden) {
+      completeBootSequence(sequenceToken);
       return;
     }
 
@@ -1472,19 +1549,22 @@ async function runBootSequence() {
     await sleep(stepDuration);
   }
 
-  if (sequenceToken !== bootSequenceToken || terminal.hidden) {
+  if (sequenceToken !== bootSequenceToken) {
+    return;
+  }
+
+  if (terminal.hidden) {
+    completeBootSequence(sequenceToken);
     return;
   }
 
   await sleep(120);
 
-  if (sequenceToken !== bootSequenceToken || terminal.hidden) {
+  if (sequenceToken !== bootSequenceToken) {
     return;
   }
 
-  submitCommand(bootCommand);
-  setInteractiveState(true);
-  focusInput();
+  completeBootSequence(sequenceToken);
 }
 
 terminal.addEventListener("click", focusInput);
@@ -1510,6 +1590,14 @@ wallpaperWindow.addEventListener("focus", () => {
   }
 });
 document.addEventListener("pointerdown", (event) => {
+  if (
+    !browserPageMenu.hidden &&
+    !browserAddress.contains(event.target) &&
+    !browserPageMenu.contains(event.target)
+  ) {
+    closeBrowserPageMenu();
+  }
+
   if (terminalWindowState === "open" && terminal.contains(event.target)) {
     setActiveWindow("terminal");
     return;
@@ -1550,7 +1638,46 @@ window.addEventListener("blur", syncWindowState);
 document.addEventListener("visibilitychange", syncWindowState);
 bindBrowserFrameFocus();
 terminalLauncher.addEventListener("click", openTerminal);
-browserLauncher.addEventListener("click", openBrowser);
+browserLauncher.addEventListener("click", () => {
+  openBrowser();
+});
+browserAddress.addEventListener("click", (event) => {
+  event.stopPropagation();
+  if (browserWindowState === "open") {
+    setActiveWindow("browser");
+  }
+  toggleBrowserPageMenu();
+});
+browserAddress.addEventListener("blur", () => {
+  window.setTimeout(() => {
+    if (
+      document.activeElement !== browserAddress &&
+      !browserPageMenu.contains(document.activeElement)
+    ) {
+      closeBrowserPageMenu();
+    }
+  }, 0);
+});
+browserPageMenu.addEventListener("click", (event) => {
+  const option = event.target.closest(".browser__page-option");
+
+  if (!option) {
+    return;
+  }
+
+  navigateBrowser(option.dataset.path);
+  setActiveWindow("browser");
+});
+browserPageMenu.addEventListener("focusout", () => {
+  window.setTimeout(() => {
+    if (
+      document.activeElement !== browserAddress &&
+      !browserPageMenu.contains(document.activeElement)
+    ) {
+      closeBrowserPageMenu();
+    }
+  }, 0);
+});
 wallpaperLauncher.addEventListener("click", openWallpaperWindow);
 closeButton.addEventListener("click", closeTerminal);
 minimizeButton.addEventListener("click", minimizeTerminal);
@@ -1561,9 +1688,9 @@ browserMaximizeButton.addEventListener("click", toggleBrowserMaximize);
 wallpaperCloseButton.addEventListener("click", closeWallpaperWindow);
 wallpaperMinimizeButton.addEventListener("click", minimizeWallpaperWindow);
 wallpaperMaximizeButton.addEventListener("click", toggleWallpaperMaximize);
-wallpaperOptions.forEach((option) => {
-  option.addEventListener("click", () => {
-    setWallpaperPreference(option.dataset.wallpaper);
+wallpaperPresetButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setWallpaperPreference(button.dataset.wallpaper);
     setActiveWindow("wallpaper");
   });
 });

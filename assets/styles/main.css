@@ -29,6 +29,10 @@
   --window-neutral-accent: #d8d8d8;
   --window-neutral-accent-soft: rgba(216, 216, 216, 0.14);
   --window-neutral-accent-border: rgba(216, 216, 216, 0.26);
+  --wallpaper-preview-accent: #f5f5f5;
+  --wallpaper-preview-accent-strong: rgba(245, 245, 245, 0.42);
+  --wallpaper-preview-accent-soft: rgba(245, 245, 245, 0.22);
+  --wallpaper-preview-accent-faint: rgba(245, 245, 245, 0.12);
   --wallpaper-window-background: rgba(8, 10, 11, 0.58);
   --wallpaper-window-border: rgba(255, 255, 255, 0.1);
   --wallpaper-option-background: rgba(255, 255, 255, 0.05);
@@ -284,6 +288,7 @@ body {
 .terminal__chrome {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
   min-height: var(--window-chrome-height);
   padding: 0 0.75rem;
   border-bottom: 1px solid var(--terminal-border);
@@ -291,12 +296,10 @@ body {
 }
 
 .browser__chrome {
-  gap: 0.75rem;
-  padding: 0 0.65rem;
+  padding: 0 0.75rem;
 }
 
 .terminal__chrome-title {
-  margin-left: 0.9rem;
   color: var(--text-muted);
   font-size: 0.8rem;
   letter-spacing: 0.08em;
@@ -567,6 +570,7 @@ body {
 }
 
 .browser__address-shell {
+  position: relative;
   flex: 1;
   min-width: 0;
 }
@@ -576,6 +580,7 @@ body {
   height: 1.45rem;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 0.62rem;
   border: 1px solid var(--terminal-border);
   border-radius: 999px;
@@ -588,6 +593,75 @@ body {
   text-overflow: ellipsis;
   font-family: inherit;
   font-weight: 400;
+  cursor: pointer;
+}
+
+.browser__address::after {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-left: 0.6rem;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(45deg) translateY(-0.08rem);
+  flex-shrink: 0;
+}
+
+.browser__page-menu {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.4rem;
+  border: 1px solid var(--terminal-border);
+  border-radius: 0.9rem;
+  background: rgba(12, 12, 12, 0.96);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.28);
+  z-index: 6;
+}
+
+.browser__page-menu[hidden] {
+  display: none;
+}
+
+:root[data-theme="light"] .browser__page-menu {
+  background: rgba(248, 249, 251, 0.98);
+}
+
+.browser__page-option {
+  width: 100%;
+  display: grid;
+  gap: 0.14rem;
+  padding: 0.68rem 0.78rem;
+  border: 1px solid transparent;
+  border-radius: 0.7rem;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.browser__page-option:hover,
+.browser__page-option:focus-visible {
+  border-color: var(--window-neutral-accent-border);
+  background: var(--window-neutral-accent-soft);
+}
+
+.browser__page-option[aria-current="page"] {
+  border-color: var(--window-neutral-accent-border);
+  background: var(--window-neutral-accent-soft);
+}
+
+.browser__page-option-name {
+  font-size: 0.88rem;
+}
+
+.browser__page-option-path {
+  color: var(--text-muted);
+  font-size: 0.72rem;
 }
 
 .browser__body {
@@ -608,11 +682,9 @@ body {
 }
 
 .wallpaper-window {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 16%),
-    var(--wallpaper-window-background);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 14%),
+    var(--terminal-background);
   border-color: var(--wallpaper-window-border);
-  backdrop-filter: blur(18px) saturate(1.1);
-  -webkit-backdrop-filter: blur(18px) saturate(1.1);
 }
 
 .wallpaper-window__chrome {
@@ -620,8 +692,7 @@ body {
 }
 
 .wallpaper-window__chrome-title {
-  margin-left: 0.9rem;
-  color: var(--window-neutral-accent);
+  color: var(--text-muted);
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -635,73 +706,47 @@ body {
   flex-direction: column;
   gap: 1rem;
   overflow-y: auto;
-}
-
-.wallpaper-window__eyebrow,
-.wallpaper-window__title,
-.wallpaper-window__copy {
-  margin: 0;
+  background: var(--wallpaper-window-background);
+  backdrop-filter: blur(18px) saturate(1.1);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
 }
 
 .wallpaper-window__eyebrow {
+  margin: 0;
+  text-align: center;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.88rem;
   letter-spacing: 0.16em;
 }
 
-.wallpaper-window__title {
-  margin-top: 0.2rem;
-  font-size: 1.35rem;
-  line-height: 1.2;
+.wallpaper-window__intro {
+  margin-bottom: 0.35rem;
 }
 
-.wallpaper-window__copy {
-  margin-top: 0.4rem;
-  max-width: 36rem;
+.wallpaper-window__control {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.wallpaper-window__label {
   color: var(--text-muted);
-  font-size: 0.92rem;
-  line-height: 1.5;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.wallpaper-window__options {
+.wallpaper-window__wallpapers {
   display: grid;
-  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
 }
 
-.wallpaper-window__accent {
+.wallpaper-preset {
   display: grid;
-  gap: 0.45rem;
-  padding-top: 0.2rem;
-}
-
-.wallpaper-window__section-title,
-.wallpaper-window__section-copy {
-  margin: 0;
-}
-
-.wallpaper-window__section-title {
-  font-size: 0.95rem;
-}
-
-.wallpaper-window__section-copy {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  line-height: 1.45;
-}
-
-.wallpaper-window__accent-presets {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(8.2rem, 1fr));
-  gap: 0.7rem;
-}
-
-.accent-preset {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.78rem 0.9rem;
+  gap: 0.4rem;
+  padding: 0.45rem;
   border: 1px solid var(--terminal-border);
-  border-radius: 0.95rem;
+  border-radius: 0.85rem;
   background: var(--wallpaper-option-background);
   color: var(--text-primary);
   font: inherit;
@@ -710,64 +755,222 @@ body {
   transition:
     border-color 140ms ease,
     background-color 140ms ease,
-    transform 140ms ease,
-    color 140ms ease;
+    transform 140ms ease;
 }
 
-.accent-preset:hover,
-.accent-preset:focus-visible {
+.wallpaper-preset:hover,
+.wallpaper-preset:focus-visible {
   border-color: var(--window-neutral-accent-border);
   background: var(--window-neutral-accent-soft);
   transform: translateY(-1px);
 }
 
-.accent-preset[aria-pressed="true"] {
+.wallpaper-preset[aria-pressed="true"] {
   border-color: var(--window-neutral-accent-border);
   background: var(--window-neutral-accent-soft);
 }
 
-.accent-preset__swatch {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
+.wallpaper-preset__preview {
+  height: 2.4rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: #0f1112;
+  background-repeat: no-repeat;
+}
+
+.wallpaper-preset__preview--lines {
+  background:
+    linear-gradient(148deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      -4% 10% / 20% 26%,
+    linear-gradient(118deg, transparent 0 47%, var(--wallpaper-preview-accent-soft) 47% 50%, transparent 50% 100%)
+      22% 56% / 15% 20%,
+    linear-gradient(160deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      43% 20% / 17% 18%,
+    linear-gradient(100deg, transparent 0 47%, var(--wallpaper-preview-accent-faint) 47% 50%, transparent 50% 100%)
+      67% 50% / 14% 24%,
+    linear-gradient(136deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      86% 8% / 20% 28%,
+    linear-gradient(180deg, #111315, #0b0c0d);
+}
+
+.wallpaper-preset__preview--bubbles {
+  background:
+    radial-gradient(circle at 14% 72%, var(--wallpaper-preview-accent-soft) 0 11%, transparent 12%),
+    radial-gradient(circle at 28% 44%, var(--wallpaper-preview-accent-faint) 0 9%, transparent 10%),
+    radial-gradient(circle at 42% 66%, var(--wallpaper-preview-accent-strong) 0 12%, transparent 13%),
+    radial-gradient(circle at 56% 30%, var(--wallpaper-preview-accent-soft) 0 10%, transparent 11%),
+    radial-gradient(circle at 68% 58%, var(--wallpaper-preview-accent-strong) 0 9%, transparent 10%),
+    radial-gradient(circle at 82% 38%, var(--wallpaper-preview-accent-faint) 0 8%, transparent 9%),
+    radial-gradient(circle at 88% 74%, var(--wallpaper-preview-accent-soft) 0 10%, transparent 11%),
+    linear-gradient(180deg, #111315, #0b0c0d);
+}
+
+.wallpaper-preset__preview--rain {
+  background:
+    linear-gradient(108deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      2% -8% / 7% 34%,
+    linear-gradient(104deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      8% 18% / 8% 42%,
+    linear-gradient(111deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      15% 2% / 6% 28%,
+    linear-gradient(102deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      22% 26% / 7% 38%,
+    linear-gradient(107deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      28% -6% / 9% 46%,
+    linear-gradient(109deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      35% 16% / 6% 30%,
+    linear-gradient(103deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      42% 4% / 8% 36%,
+    linear-gradient(110deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      48% 24% / 7% 40%,
+    linear-gradient(105deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      54% -10% / 6% 26%,
+    linear-gradient(108deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      60% 12% / 8% 44%,
+    linear-gradient(101deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      66% 30% / 7% 34%,
+    linear-gradient(112deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      72% 0% / 6% 24%,
+    linear-gradient(104deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      78% 20% / 8% 42%,
+    linear-gradient(109deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      84% -4% / 7% 36%,
+    linear-gradient(106deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      90% 14% / 6% 28%,
+    linear-gradient(103deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      95% 32% / 6% 24%,
+    linear-gradient(180deg, #111315, #0b0c0d);
+}
+
+:root[data-theme="light"] .wallpaper-preset__preview--lines {
+  background:
+    linear-gradient(148deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      -4% 10% / 20% 26%,
+    linear-gradient(118deg, transparent 0 47%, var(--wallpaper-preview-accent-soft) 47% 50%, transparent 50% 100%)
+      22% 56% / 15% 20%,
+    linear-gradient(160deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      43% 20% / 17% 18%,
+    linear-gradient(100deg, transparent 0 47%, var(--wallpaper-preview-accent-faint) 47% 50%, transparent 50% 100%)
+      67% 50% / 14% 24%,
+    linear-gradient(136deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      86% 8% / 20% 28%,
+    linear-gradient(180deg, #f3f5f8, #e8edf3);
+}
+
+:root[data-theme="light"] .wallpaper-preset__preview--bubbles {
+  background:
+    radial-gradient(circle at 14% 72%, var(--wallpaper-preview-accent-soft) 0 11%, transparent 12%),
+    radial-gradient(circle at 28% 44%, var(--wallpaper-preview-accent-faint) 0 9%, transparent 10%),
+    radial-gradient(circle at 42% 66%, var(--wallpaper-preview-accent-strong) 0 12%, transparent 13%),
+    radial-gradient(circle at 56% 30%, var(--wallpaper-preview-accent-soft) 0 10%, transparent 11%),
+    radial-gradient(circle at 68% 58%, var(--wallpaper-preview-accent-strong) 0 9%, transparent 10%),
+    radial-gradient(circle at 82% 38%, var(--wallpaper-preview-accent-faint) 0 8%, transparent 9%),
+    radial-gradient(circle at 88% 74%, var(--wallpaper-preview-accent-soft) 0 10%, transparent 11%),
+    linear-gradient(180deg, #f3f5f8, #e8edf3);
+}
+
+:root[data-theme="light"] .wallpaper-preset__preview--rain {
+  background:
+    linear-gradient(108deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      2% -8% / 7% 34%,
+    linear-gradient(104deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      8% 18% / 8% 42%,
+    linear-gradient(111deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      15% 2% / 6% 28%,
+    linear-gradient(102deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      22% 26% / 7% 38%,
+    linear-gradient(107deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      28% -6% / 9% 46%,
+    linear-gradient(109deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      35% 16% / 6% 30%,
+    linear-gradient(103deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      42% 4% / 8% 36%,
+    linear-gradient(110deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      48% 24% / 7% 40%,
+    linear-gradient(105deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      54% -10% / 6% 26%,
+    linear-gradient(108deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      60% 12% / 8% 44%,
+    linear-gradient(101deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      66% 30% / 7% 34%,
+    linear-gradient(112deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      72% 0% / 6% 24%,
+    linear-gradient(104deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      78% 20% / 8% 42%,
+    linear-gradient(109deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
+      84% -4% / 7% 36%,
+    linear-gradient(106deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
+      90% 14% / 6% 28%,
+    linear-gradient(103deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
+      95% 32% / 6% 24%,
+    linear-gradient(180deg, #f3f5f8, #e8edf3);
+}
+
+.wallpaper-preset__name {
+  font-size: 0.82rem;
+}
+
+.wallpaper-window__accent-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.accent-preset {
+  width: 1.45rem;
+  height: 1.45rem;
+  padding: 0;
+  border: 1px solid transparent;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: currentColor;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
 }
 
-.accent-preset__label {
-  font-size: 0.9rem;
+.accent-preset:hover,
+.accent-preset:focus-visible {
+  transform: scale(1.06);
+  border-color: var(--window-neutral-accent-border);
 }
 
-.accent-preset__swatch--white {
-  background: #f5f5f5;
+.accent-preset[aria-pressed="true"] {
+  border-color: var(--window-neutral-accent-border);
+  box-shadow: 0 0 0 3px var(--window-neutral-accent-soft);
 }
 
-.accent-preset__swatch--red {
-  background: #ff6b6b;
+.accent-preset[data-accent="white"] {
+  color: #f5f5f5;
 }
 
-.accent-preset__swatch--green {
-  background: #7fe36a;
+.accent-preset[data-accent="red"] {
+  color: #ff6b6b;
 }
 
-.accent-preset__swatch--blue {
-  background: #79aef8;
+.accent-preset[data-accent="green"] {
+  color: #7fe36a;
 }
 
-.accent-preset__swatch--yellow {
-  background: #f2d15c;
+.accent-preset[data-accent="blue"] {
+  color: #79aef8;
 }
 
-.accent-preset__swatch--cyan {
-  background: #67dce6;
+.accent-preset[data-accent="yellow"] {
+  color: #f2d15c;
 }
 
-.accent-preset__swatch--purple {
-  background: #9b88f7;
+.accent-preset[data-accent="cyan"] {
+  color: #67dce6;
 }
 
-.accent-preset__swatch--magenta {
-  background: #f071c4;
+.accent-preset[data-accent="purple"] {
+  color: #9b88f7;
+}
+
+.accent-preset[data-accent="magenta"] {
+  color: #f071c4;
 }
 
 .sr-only {
