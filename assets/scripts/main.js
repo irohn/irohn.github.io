@@ -26,6 +26,7 @@ const wallpaperCloseButton = document.querySelector("#wallpaper-close");
 const wallpaperMinimizeButton = document.querySelector("#wallpaper-minimize");
 const wallpaperMaximizeButton = document.querySelector("#wallpaper-maximize");
 const wallpaperOptions = document.querySelectorAll(".wallpaper-option");
+const accentPresetButtons = document.querySelectorAll(".accent-preset");
 const themeToggle = document.querySelector("#theme-toggle");
 
 const siteName = "irohn.net";
@@ -41,8 +42,19 @@ const bootCommand = "whoami";
 const bootDurationMs = 1000;
 const themeStorageKey = "irohn-theme-preference";
 const wallpaperStorageKey = "irohn-wallpaper-preference";
+const accentPresetStorageKey = "irohn-accent-preset";
 const aliases = {
   www: "cd /srv/irohn.net",
+};
+const accentPresets = {
+  white: "#f5f5f5",
+  red: "#ff6b6b",
+  green: "#7fe36a",
+  blue: "#79aef8",
+  yellow: "#f2d15c",
+  cyan: "#67dce6",
+  purple: "#9b88f7",
+  magenta: "#f071c4",
 };
 const wallpapers = {
   default: { label: "Lines" },
@@ -66,6 +78,7 @@ let needsBootSequence = true;
 let bootSequenceToken = 0;
 let themePreference = window.localStorage.getItem(themeStorageKey) ?? "dark";
 let wallpaperPreference = window.localStorage.getItem(wallpaperStorageKey) ?? "default";
+let accentPreset = window.localStorage.getItem(accentPresetStorageKey) ?? "white";
 let terminalWindowState = "closed";
 let browserWindowState = "closed";
 let wallpaperWindowState = "closed";
@@ -404,12 +417,14 @@ function appendAnimate(element, attributeName, values, duration) {
 }
 
 function getWallpaperPalette(theme) {
+  const accentColor = accentPresets[accentPreset] ?? accentPresets.white;
+
   if (theme === "light") {
     return {
       background: "#f3f5f8",
       accent: "#1e2530",
-      muted: "#456c92",
-      soft: "#2f8a39",
+      muted: mixHexColors(accentColor, "#456c92", 0.28),
+      soft: mixHexColors(accentColor, "#f3f5f8", 0.18),
       haze: "rgba(255, 255, 255, 0.28)",
     };
   }
@@ -417,10 +432,69 @@ function getWallpaperPalette(theme) {
   return {
     background: "#101112",
     accent: "#eef3f7",
-    muted: "#7fa8c9",
-    soft: "#7fe36a",
+    muted: mixHexColors(accentColor, "#7fa8c9", 0.32),
+    soft: mixHexColors(accentColor, "#101112", 0.14),
     haze: "rgba(255, 255, 255, 0.14)",
   };
+}
+
+function hexToRgb(hexColor) {
+  const normalized = /^#[0-9a-f]{6}$/i.test(String(hexColor ?? "").trim())
+    ? String(hexColor).trim().toLowerCase()
+    : null;
+
+  if (!normalized) {
+    return null;
+  }
+
+  return {
+    red: Number.parseInt(normalized.slice(1, 3), 16),
+    green: Number.parseInt(normalized.slice(3, 5), 16),
+    blue: Number.parseInt(normalized.slice(5, 7), 16),
+  };
+}
+
+function rgbToHex({ red, green, blue }) {
+  return `#${[red, green, blue]
+    .map((value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+function mixHexColors(leftHex, rightHex, ratio) {
+  const left = hexToRgb(leftHex);
+  const right = hexToRgb(rightHex);
+
+  if (!left || !right) {
+    return leftHex;
+  }
+
+  return rgbToHex({
+    red: left.red + (right.red - left.red) * ratio,
+    green: left.green + (right.green - left.green) * ratio,
+    blue: left.blue + (right.blue - left.blue) * ratio,
+  });
+}
+
+function syncAccentControls() {
+  accentPresetButtons.forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.accent === accentPreset));
+  });
+}
+
+function applyAccentTheme() {
+  const accentColor = accentPresets[accentPreset] ?? accentPresets.white;
+  const accentRgb = hexToRgb(accentColor) ?? { red: 245, green: 245, blue: 245 };
+
+  document.documentElement.style.setProperty("--window-neutral-accent", accentColor);
+  document.documentElement.style.setProperty(
+    "--window-neutral-accent-soft",
+    `rgba(${accentRgb.red}, ${accentRgb.green}, ${accentRgb.blue}, 0.14)`
+  );
+  document.documentElement.style.setProperty(
+    "--window-neutral-accent-border",
+    `rgba(${accentRgb.red}, ${accentRgb.green}, ${accentRgb.blue}, 0.3)`
+  );
+  document.documentElement.style.setProperty("--desktop-app-indicator-active", accentColor);
 }
 
 function renderLineWallpaper(root, theme) {
@@ -718,6 +792,7 @@ function applyTheme() {
     "aria-label",
     `Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`
   );
+  applyAccentTheme();
   applyWallpaper();
 }
 
@@ -729,6 +804,20 @@ function setWallpaperPreference(value) {
   wallpaperPreference = value;
   window.localStorage.setItem(wallpaperStorageKey, wallpaperPreference);
   applyWallpaper();
+}
+
+function setAccentPreset(value) {
+  if (!accentPresets[value]) {
+    syncAccentControls();
+    return false;
+  }
+
+  accentPreset = value;
+  window.localStorage.setItem(accentPresetStorageKey, accentPreset);
+  syncAccentControls();
+  applyAccentTheme();
+  applyWallpaper();
+  return true;
 }
 
 function setInteractiveState(value) {
@@ -1478,6 +1567,12 @@ wallpaperOptions.forEach((option) => {
     setActiveWindow("wallpaper");
   });
 });
+accentPresetButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setAccentPreset(button.dataset.accent);
+    setActiveWindow("wallpaper");
+  });
+});
 themeToggle.addEventListener("click", () => {
   const resolvedTheme = getResolvedTheme();
   themePreference = resolvedTheme === "dark" ? "light" : "dark";
@@ -1503,6 +1598,7 @@ terminalInput.addEventListener("keydown", (event) => {
 });
 
 applyTheme();
+syncAccentControls();
 syncWindowState();
 syncPrompt();
 resetTerminalState({ shouldBootSequence: true });

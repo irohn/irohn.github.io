@@ -11,27 +11,23 @@
     <style>
       :root {
         color-scheme: dark;
-        --links-background:
-          radial-gradient(circle at top, rgba(127, 227, 106, 0.12), transparent 28%),
-          #0f1110;
-        --links-text: #eef2ea;
-        --links-card: rgba(18, 20, 18, 0.92);
+        --links-background: #0e0e10;
+        --links-text: #f1f1f1;
+        --links-card: rgba(20, 20, 22, 0.92);
         --links-border: rgba(255, 255, 255, 0.08);
         --links-shadow: rgba(0, 0, 0, 0.28);
-        --links-icon-background: rgba(255, 255, 255, 0.04);
-        --links-icon-color: #f8faf7;
-        --links-heading-muted: #9aa19a;
-        --links-anchor: #eef2ea;
-        --links-anchor-hover: #7fe36a;
-        --links-description: #9aa19a;
-        --links-kicker: #7a7a7a;
+        --links-icon-background: rgba(255, 255, 255, 0.05);
+        --links-icon-color: #f5f5f5;
+        --links-heading-muted: #a0a0a0;
+        --links-anchor: #f1f1f1;
+        --links-anchor-hover: #d0d0d0;
+        --links-description: #a0a0a0;
+        --links-kicker: #808080;
       }
 
       :root[data-theme="light"] {
         color-scheme: light;
-        --links-background:
-          radial-gradient(circle at top, rgba(47, 138, 57, 0.12), transparent 28%),
-          #eef1f5;
+        --links-background: #eef1f5;
         --links-text: #18212f;
         --links-card: rgba(248, 249, 251, 0.95);
         --links-border: rgba(15, 23, 42, 0.08);
@@ -40,7 +36,7 @@
         --links-icon-color: #202938;
         --links-heading-muted: #657285;
         --links-anchor: #18212f;
-        --links-anchor-hover: #2f8a39;
+        --links-anchor-hover: #cfd4dc;
         --links-description: #657285;
         --links-kicker: #657285;
       }
@@ -48,8 +44,22 @@
       body {
         min-height: 100vh;
         margin: 0;
-        background: var(--links-background);
+        background: var(--links-background) !important;
+        background-image: none !important;
         color: var(--links-text);
+      }
+
+      html {
+        background: var(--links-background) !important;
+        background-image: none !important;
+      }
+
+      main,
+      section,
+      .container,
+      .links-shell {
+        background: transparent !important;
+        background-image: none !important;
       }
 
       .links-shell {
@@ -57,7 +67,7 @@
       }
 
       .links-card {
-        background: var(--links-card);
+        background: var(--links-card) !important;
         border: 1px solid var(--links-border);
         border-radius: 1rem;
         box-shadow: 0 18px 48px var(--links-shadow);
@@ -112,9 +122,7 @@
     <main class="container py-5">
       <section class="links-shell mx-auto">
         <div class="links-card p-4 p-md-5">
-          <p class="text-uppercase small links-kicker mb-2">HOME</p>
-          <h1 class="links-title h3 mb-2">My links</h1>
-          <p class="small links-subtitle mb-4">Quick links opened from the dock browser.</p>
+          <p class="text-uppercase small links-kicker mb-2">SOCIALS</p>
 
           <div class="list-group list-group-flush links-list">
             <a

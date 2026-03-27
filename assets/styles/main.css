@@ -24,13 +24,16 @@
   --desktop-app-terminal: #f5f5f5;
   --desktop-app-browser: #d6d6d6;
   --desktop-app-wallpaper: #dfdfdf;
-  --desktop-app-indicator-active: rgba(255, 255, 255, 0.94);
+  --desktop-app-indicator-active: #f5f5f5;
   --desktop-app-indicator-inactive: rgba(255, 255, 255, 0.28);
+  --window-neutral-accent: #d8d8d8;
+  --window-neutral-accent-soft: rgba(216, 216, 216, 0.14);
+  --window-neutral-accent-border: rgba(216, 216, 216, 0.26);
   --wallpaper-window-background: rgba(8, 10, 11, 0.58);
   --wallpaper-window-border: rgba(255, 255, 255, 0.1);
   --wallpaper-option-background: rgba(255, 255, 255, 0.05);
-  --wallpaper-option-background-active: rgba(127, 227, 106, 0.14);
-  --wallpaper-option-border-active: rgba(127, 227, 106, 0.3);
+  --wallpaper-option-background-active: var(--window-neutral-accent-soft);
+  --wallpaper-option-border-active: var(--window-neutral-accent-border);
   --font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono",
     Menlo, monospace;
 }
@@ -65,13 +68,16 @@
   --desktop-app-terminal: #18212f;
   --desktop-app-browser: #202938;
   --desktop-app-wallpaper: #202938;
-  --desktop-app-indicator-active: rgba(24, 33, 47, 0.92);
+  --desktop-app-indicator-active: #18212f;
   --desktop-app-indicator-inactive: rgba(24, 33, 47, 0.28);
+  --window-neutral-accent: #cfd4dc;
+  --window-neutral-accent-soft: rgba(207, 212, 220, 0.16);
+  --window-neutral-accent-border: rgba(207, 212, 220, 0.34);
   --wallpaper-window-background: rgba(248, 249, 251, 0.6);
   --wallpaper-window-border: rgba(15, 23, 42, 0.12);
   --wallpaper-option-background: rgba(15, 23, 42, 0.04);
-  --wallpaper-option-background-active: rgba(47, 138, 57, 0.12);
-  --wallpaper-option-border-active: rgba(47, 138, 57, 0.28);
+  --wallpaper-option-background-active: var(--window-neutral-accent-soft);
+  --wallpaper-option-border-active: var(--window-neutral-accent-border);
 }
 
 *,
@@ -270,6 +276,11 @@ body {
   outline-offset: 4px;
 }
 
+.browser-window:focus-visible,
+.wallpaper-window:focus-visible {
+  outline-color: var(--window-neutral-accent-border);
+}
+
 .terminal__chrome {
   display: flex;
   align-items: center;
@@ -282,6 +293,14 @@ body {
 .browser__chrome {
   gap: 0.75rem;
   padding: 0 0.65rem;
+}
+
+.terminal__chrome-title {
+  margin-left: 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .terminal__controls {
@@ -600,6 +619,14 @@ body {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.wallpaper-window__chrome-title {
+  margin-left: 0.9rem;
+  color: var(--window-neutral-accent);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .wallpaper-window__body {
   flex: 1;
   min-height: 0;
@@ -639,6 +666,120 @@ body {
 .wallpaper-window__options {
   display: grid;
   gap: 0.75rem;
+}
+
+.wallpaper-window__accent {
+  display: grid;
+  gap: 0.45rem;
+  padding-top: 0.2rem;
+}
+
+.wallpaper-window__section-title,
+.wallpaper-window__section-copy {
+  margin: 0;
+}
+
+.wallpaper-window__section-title {
+  font-size: 0.95rem;
+}
+
+.wallpaper-window__section-copy {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.wallpaper-window__accent-presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.2rem, 1fr));
+  gap: 0.7rem;
+}
+
+.accent-preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.78rem 0.9rem;
+  border: 1px solid var(--terminal-border);
+  border-radius: 0.95rem;
+  background: var(--wallpaper-option-background);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    transform 140ms ease,
+    color 140ms ease;
+}
+
+.accent-preset:hover,
+.accent-preset:focus-visible {
+  border-color: var(--window-neutral-accent-border);
+  background: var(--window-neutral-accent-soft);
+  transform: translateY(-1px);
+}
+
+.accent-preset[aria-pressed="true"] {
+  border-color: var(--window-neutral-accent-border);
+  background: var(--window-neutral-accent-soft);
+}
+
+.accent-preset__swatch {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.accent-preset__label {
+  font-size: 0.9rem;
+}
+
+.accent-preset__swatch--white {
+  background: #f5f5f5;
+}
+
+.accent-preset__swatch--red {
+  background: #ff6b6b;
+}
+
+.accent-preset__swatch--green {
+  background: #7fe36a;
+}
+
+.accent-preset__swatch--blue {
+  background: #79aef8;
+}
+
+.accent-preset__swatch--yellow {
+  background: #f2d15c;
+}
+
+.accent-preset__swatch--cyan {
+  background: #67dce6;
+}
+
+.accent-preset__swatch--purple {
+  background: #9b88f7;
+}
+
+.accent-preset__swatch--magenta {
+  background: #f071c4;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .wallpaper-option {
