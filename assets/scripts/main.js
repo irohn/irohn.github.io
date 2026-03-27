@@ -592,7 +592,6 @@ function renderBubbleWallpaper(root, theme) {
     })
   );
 
-  const defs = createSvgElement("defs");
   const bubblesGroup = createSvgElement("g");
   const particlesGroup = createSvgElement("g", { opacity: 0.55 });
   const bubbles = [
@@ -612,7 +611,6 @@ function renderBubbleWallpaper(root, theme) {
 
   bubbles.forEach(([cx, cy, radius, peak, duration], index) => {
     const bubbleColor = index % 2 === 0 ? palette.muted : palette.soft;
-    const gradientId = `bubble-gradient-${theme}-${index}`;
     const motionClass = radius <= 16 ? "small" : radius <= 22 ? "medium" : "large";
     const riseSeconds = duration / 1.5;
     const riseDuration = riseSeconds.toFixed(2);
@@ -629,33 +627,6 @@ function renderBubbleWallpaper(root, theme) {
         : motionClass === "medium"
           ? 0.9 + (index % 3) * 0.3
           : 1.3 + (index % 4) * 0.35;
-    const gradient = createSvgElement("radialGradient", {
-      id: gradientId,
-      cx: `${32 + (index % 4) * 4}%`,
-      cy: `${30 + (index % 3) * 5}%`,
-      r: "78%",
-      fx: `${28 + (index % 4) * 4}%`,
-      fy: `${26 + (index % 3) * 4}%`,
-    });
-    gradient.append(
-      createSvgElement("stop", {
-        offset: "0%",
-        "stop-color": palette.accent,
-        "stop-opacity": theme === "light" ? 0.22 : 0.16,
-      }),
-      createSvgElement("stop", {
-        offset: "52%",
-        "stop-color": bubbleColor,
-        "stop-opacity": theme === "light" ? 0.12 : 0.1,
-      }),
-      createSvgElement("stop", {
-        offset: "100%",
-        "stop-color": bubbleColor,
-        "stop-opacity": theme === "light" ? 0.04 : 0.032,
-      })
-    );
-    defs.append(gradient);
-
     const bubble = createSvgElement("ellipse", {
       cx,
       cy,
@@ -671,8 +642,8 @@ function renderBubbleWallpaper(root, theme) {
           : motionClass === "medium"
             ? radius * 1.0
             : radius * 1.01,
-      fill: `url(#${gradientId})`,
-      opacity: 0.52,
+      fill: bubbleColor,
+      opacity: theme === "light" ? 0.16 : 0.14,
     });
     appendAnimate(
       bubble,
@@ -745,7 +716,7 @@ function renderBubbleWallpaper(root, theme) {
     }
   });
 
-  root.append(defs, bubblesGroup, particlesGroup);
+  root.append(bubblesGroup, particlesGroup);
 }
 
 function renderRainWallpaper(root, theme) {

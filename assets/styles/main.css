@@ -780,129 +780,129 @@ body {
 
 .wallpaper-preset__preview--lines {
   background:
-    linear-gradient(148deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
-      -4% 10% / 20% 26%,
+    linear-gradient(146deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      -3% 6% / 18% 26% no-repeat,
     linear-gradient(118deg, transparent 0 47%, var(--wallpaper-preview-accent-soft) 47% 50%, transparent 50% 100%)
-      22% 56% / 15% 20%,
-    linear-gradient(160deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
-      43% 20% / 17% 18%,
-    linear-gradient(100deg, transparent 0 47%, var(--wallpaper-preview-accent-faint) 47% 50%, transparent 50% 100%)
-      67% 50% / 14% 24%,
-    linear-gradient(136deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
-      86% 8% / 20% 28%,
+      20% 58% / 13% 20% no-repeat,
+    linear-gradient(158deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      41% 18% / 16% 18% no-repeat,
+    linear-gradient(96deg, transparent 0 47%, var(--wallpaper-preview-accent-faint) 47% 50%, transparent 50% 100%)
+      66% 48% / 12% 24% no-repeat,
+    linear-gradient(132deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      84% 4% / 17% 30% no-repeat,
     linear-gradient(180deg, #111315, #0b0c0d);
 }
 
 .wallpaper-preset__preview--bubbles {
   background:
-    radial-gradient(circle at 14% 72%, var(--wallpaper-preview-accent-soft) 0 11%, transparent 12%),
-    radial-gradient(circle at 28% 44%, var(--wallpaper-preview-accent-faint) 0 9%, transparent 10%),
-    radial-gradient(circle at 42% 66%, var(--wallpaper-preview-accent-strong) 0 12%, transparent 13%),
-    radial-gradient(circle at 56% 30%, var(--wallpaper-preview-accent-soft) 0 10%, transparent 11%),
-    radial-gradient(circle at 68% 58%, var(--wallpaper-preview-accent-strong) 0 9%, transparent 10%),
-    radial-gradient(circle at 82% 38%, var(--wallpaper-preview-accent-faint) 0 8%, transparent 9%),
-    radial-gradient(circle at 88% 74%, var(--wallpaper-preview-accent-soft) 0 10%, transparent 11%),
+    radial-gradient(circle at 12% 72%, var(--wallpaper-preview-accent-soft) 0 9%, transparent 10%),
+    radial-gradient(circle at 26% 38%, var(--wallpaper-preview-accent-faint) 0 7%, transparent 8%),
+    radial-gradient(circle at 40% 64%, var(--wallpaper-preview-accent-strong) 0 10%, transparent 11%),
+    radial-gradient(circle at 55% 24%, var(--wallpaper-preview-accent-soft) 0 8%, transparent 9%),
+    radial-gradient(circle at 68% 56%, var(--wallpaper-preview-accent-strong) 0 7%, transparent 8%),
+    radial-gradient(circle at 82% 34%, var(--wallpaper-preview-accent-faint) 0 6%, transparent 7%),
+    radial-gradient(circle at 90% 72%, var(--wallpaper-preview-accent-soft) 0 8%, transparent 9%),
     linear-gradient(180deg, #111315, #0b0c0d);
 }
 
 .wallpaper-preset__preview--rain {
   background:
     linear-gradient(108deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      2% -8% / 7% 34%,
+      2% -8% / 7% 34% no-repeat,
     linear-gradient(104deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      8% 18% / 8% 42%,
+      8% 18% / 8% 42% no-repeat,
     linear-gradient(111deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      15% 2% / 6% 28%,
+      15% 2% / 6% 28% no-repeat,
     linear-gradient(102deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      22% 26% / 7% 38%,
+      22% 26% / 7% 38% no-repeat,
     linear-gradient(107deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      28% -6% / 9% 46%,
+      28% -6% / 9% 46% no-repeat,
     linear-gradient(109deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      35% 16% / 6% 30%,
+      35% 16% / 6% 30% no-repeat,
     linear-gradient(103deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      42% 4% / 8% 36%,
+      42% 4% / 8% 36% no-repeat,
     linear-gradient(110deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      48% 24% / 7% 40%,
+      48% 24% / 7% 40% no-repeat,
     linear-gradient(105deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      54% -10% / 6% 26%,
+      54% -10% / 6% 26% no-repeat,
     linear-gradient(108deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      60% 12% / 8% 44%,
+      60% 12% / 8% 44% no-repeat,
     linear-gradient(101deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      66% 30% / 7% 34%,
+      66% 30% / 7% 34% no-repeat,
     linear-gradient(112deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      72% 0% / 6% 24%,
+      72% 0% / 6% 24% no-repeat,
     linear-gradient(104deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      78% 20% / 8% 42%,
+      78% 20% / 8% 42% no-repeat,
     linear-gradient(109deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      84% -4% / 7% 36%,
+      84% -4% / 7% 36% no-repeat,
     linear-gradient(106deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      90% 14% / 6% 28%,
+      90% 14% / 6% 28% no-repeat,
     linear-gradient(103deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      95% 32% / 6% 24%,
+      95% 32% / 6% 24% no-repeat,
     linear-gradient(180deg, #111315, #0b0c0d);
 }
 
 :root[data-theme="light"] .wallpaper-preset__preview--lines {
   background:
-    linear-gradient(148deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
-      -4% 10% / 20% 26%,
+    linear-gradient(146deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      -3% 6% / 18% 26% no-repeat,
     linear-gradient(118deg, transparent 0 47%, var(--wallpaper-preview-accent-soft) 47% 50%, transparent 50% 100%)
-      22% 56% / 15% 20%,
-    linear-gradient(160deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
-      43% 20% / 17% 18%,
-    linear-gradient(100deg, transparent 0 47%, var(--wallpaper-preview-accent-faint) 47% 50%, transparent 50% 100%)
-      67% 50% / 14% 24%,
-    linear-gradient(136deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
-      86% 8% / 20% 28%,
+      20% 58% / 13% 20% no-repeat,
+    linear-gradient(158deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      41% 18% / 16% 18% no-repeat,
+    linear-gradient(96deg, transparent 0 47%, var(--wallpaper-preview-accent-faint) 47% 50%, transparent 50% 100%)
+      66% 48% / 12% 24% no-repeat,
+    linear-gradient(132deg, transparent 0 47%, var(--wallpaper-preview-accent-strong) 47% 50%, transparent 50% 100%)
+      84% 4% / 17% 30% no-repeat,
     linear-gradient(180deg, #f3f5f8, #e8edf3);
 }
 
 :root[data-theme="light"] .wallpaper-preset__preview--bubbles {
   background:
-    radial-gradient(circle at 14% 72%, var(--wallpaper-preview-accent-soft) 0 11%, transparent 12%),
-    radial-gradient(circle at 28% 44%, var(--wallpaper-preview-accent-faint) 0 9%, transparent 10%),
-    radial-gradient(circle at 42% 66%, var(--wallpaper-preview-accent-strong) 0 12%, transparent 13%),
-    radial-gradient(circle at 56% 30%, var(--wallpaper-preview-accent-soft) 0 10%, transparent 11%),
-    radial-gradient(circle at 68% 58%, var(--wallpaper-preview-accent-strong) 0 9%, transparent 10%),
-    radial-gradient(circle at 82% 38%, var(--wallpaper-preview-accent-faint) 0 8%, transparent 9%),
-    radial-gradient(circle at 88% 74%, var(--wallpaper-preview-accent-soft) 0 10%, transparent 11%),
+    radial-gradient(circle at 12% 72%, var(--wallpaper-preview-accent-soft) 0 9%, transparent 10%),
+    radial-gradient(circle at 26% 38%, var(--wallpaper-preview-accent-faint) 0 7%, transparent 8%),
+    radial-gradient(circle at 40% 64%, var(--wallpaper-preview-accent-strong) 0 10%, transparent 11%),
+    radial-gradient(circle at 55% 24%, var(--wallpaper-preview-accent-soft) 0 8%, transparent 9%),
+    radial-gradient(circle at 68% 56%, var(--wallpaper-preview-accent-strong) 0 7%, transparent 8%),
+    radial-gradient(circle at 82% 34%, var(--wallpaper-preview-accent-faint) 0 6%, transparent 7%),
+    radial-gradient(circle at 90% 72%, var(--wallpaper-preview-accent-soft) 0 8%, transparent 9%),
     linear-gradient(180deg, #f3f5f8, #e8edf3);
 }
 
 :root[data-theme="light"] .wallpaper-preset__preview--rain {
   background:
     linear-gradient(108deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      2% -8% / 7% 34%,
+      2% -8% / 7% 34% no-repeat,
     linear-gradient(104deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      8% 18% / 8% 42%,
+      8% 18% / 8% 42% no-repeat,
     linear-gradient(111deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      15% 2% / 6% 28%,
+      15% 2% / 6% 28% no-repeat,
     linear-gradient(102deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      22% 26% / 7% 38%,
+      22% 26% / 7% 38% no-repeat,
     linear-gradient(107deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      28% -6% / 9% 46%,
+      28% -6% / 9% 46% no-repeat,
     linear-gradient(109deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      35% 16% / 6% 30%,
+      35% 16% / 6% 30% no-repeat,
     linear-gradient(103deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      42% 4% / 8% 36%,
+      42% 4% / 8% 36% no-repeat,
     linear-gradient(110deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      48% 24% / 7% 40%,
+      48% 24% / 7% 40% no-repeat,
     linear-gradient(105deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      54% -10% / 6% 26%,
+      54% -10% / 6% 26% no-repeat,
     linear-gradient(108deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      60% 12% / 8% 44%,
+      60% 12% / 8% 44% no-repeat,
     linear-gradient(101deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      66% 30% / 7% 34%,
+      66% 30% / 7% 34% no-repeat,
     linear-gradient(112deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      72% 0% / 6% 24%,
+      72% 0% / 6% 24% no-repeat,
     linear-gradient(104deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      78% 20% / 8% 42%,
+      78% 20% / 8% 42% no-repeat,
     linear-gradient(109deg, transparent 0 46%, var(--wallpaper-preview-accent-strong) 46% 48%, transparent 48% 100%)
-      84% -4% / 7% 36%,
+      84% -4% / 7% 36% no-repeat,
     linear-gradient(106deg, transparent 0 46%, var(--wallpaper-preview-accent-faint) 46% 48%, transparent 48% 100%)
-      90% 14% / 6% 28%,
+      90% 14% / 6% 28% no-repeat,
     linear-gradient(103deg, transparent 0 46%, var(--wallpaper-preview-accent-soft) 46% 48%, transparent 48% 100%)
-      95% 32% / 6% 24%,
+      95% 32% / 6% 24% no-repeat,
     linear-gradient(180deg, #f3f5f8, #e8edf3);
 }
 
