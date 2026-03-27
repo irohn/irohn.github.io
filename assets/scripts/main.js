@@ -1,3 +1,4 @@
+const wallpaperImage = document.querySelector("#wallpaper-image");
 const terminal = document.querySelector(".terminal");
 const pageShell = document.querySelector(".page-shell");
 const terminalBody = document.querySelector(".terminal__body");
@@ -32,8 +33,15 @@ const maxHistoryLines = 1000;
 const bootCommand = "whoami";
 const bootDurationMs = 1000;
 const themeStorageKey = "irohn-theme-preference";
+const wallpaperStorageKey = "irohn-wallpaper-preference";
 const aliases = {
   www: "cd /srv/irohn.net",
+};
+const wallpapers = {
+  default: {
+    dark: "assets/images/wallpaper-default-dark.svg",
+    light: "assets/images/wallpaper-default-light.svg",
+  },
 };
 const bashrcContent = `# ~/.bashrc: executed by bash(1)
 
@@ -51,6 +59,7 @@ let isInteractive = false;
 let needsBootSequence = true;
 let bootSequenceToken = 0;
 let themePreference = window.localStorage.getItem(themeStorageKey) ?? "dark";
+let wallpaperPreference = window.localStorage.getItem(wallpaperStorageKey) ?? "default";
 let terminalWindowState = "closed";
 let browserWindowState = "closed";
 let activeWindow = null;
@@ -361,6 +370,15 @@ function getResolvedTheme() {
   return themePreference === "light" ? "light" : "dark";
 }
 
+function getResolvedWallpaper() {
+  return wallpapers[wallpaperPreference] ?? wallpapers.default;
+}
+
+function applyWallpaper() {
+  const variant = getResolvedWallpaper();
+  wallpaperImage.src = variant[getResolvedTheme()];
+}
+
 function applyTheme() {
   const resolvedTheme = getResolvedTheme();
   document.documentElement.dataset.theme = resolvedTheme;
@@ -369,6 +387,7 @@ function applyTheme() {
     "aria-label",
     `Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`
   );
+  applyWallpaper();
 }
 
 function setInteractiveState(value) {

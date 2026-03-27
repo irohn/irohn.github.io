@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <rect width="1600" height="1000" fill="#f3f5f8" />
+  <g stroke="#1e2530" stroke-linecap="round" stroke-width="3" opacity="0.34">
+    <line x1="120" y1="180" x2="300" y2="150">
+      <animate attributeName="x2" values="300;360;320;300" dur="13s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="150;138;168;150" dur="11s" repeatCount="indefinite" />
+    </line>
+    <line x1="420" y1="120" x2="520" y2="260">
+      <animate attributeName="x2" values="520;575;545;520" dur="16s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="260;330;290;260" dur="14s" repeatCount="indefinite" />
+    </line>
+    <line x1="760" y1="110" x2="940" y2="108">
+      <animate attributeName="x2" values="940;1020;980;940" dur="12s" repeatCount="indefinite" />
+    </line>
+    <line x1="1130" y1="160" x2="1230" y2="280">
+      <animate attributeName="x2" values="1230;1290;1250;1230" dur="15s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="280;350;320;280" dur="12s" repeatCount="indefinite" />
+    </line>
+    <line x1="1380" y1="120" x2="1510" y2="170">
+      <animate attributeName="x2" values="1510;1565;1530;1510" dur="10s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="170;200;185;170" dur="9s" repeatCount="indefinite" />
+    </line>
+    <line x1="180" y1="410" x2="280" y2="520">
+      <animate attributeName="x2" values="280;350;315;280" dur="14s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="520;595;560;520" dur="15s" repeatCount="indefinite" />
+    </line>
+    <line x1="520" y1="460" x2="710" y2="388">
+      <animate attributeName="x2" values="710;800;760;710" dur="17s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="388;350;372;388" dur="13s" repeatCount="indefinite" />
+    </line>
+    <line x1="905" y1="430" x2="1060" y2="600">
+      <animate attributeName="x2" values="1060;1140;1105;1060" dur="18s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="600;690;650;600" dur="12s" repeatCount="indefinite" />
+    </line>
+    <line x1="1280" y1="470" x2="1435" y2="415">
+      <animate attributeName="x2" values="1435;1510;1475;1435" dur="11s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="415;390;404;415" dur="14s" repeatCount="indefinite" />
+    </line>
+    <line x1="160" y1="760" x2="360" y2="750">
+      <animate attributeName="x2" values="360;450;405;360" dur="15s" repeatCount="indefinite" />
+    </line>
+    <line x1="460" y1="760" x2="590" y2="900">
+      <animate attributeName="x2" values="590;650;620;590" dur="12s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="900;970;935;900" dur="16s" repeatCount="indefinite" />
+    </line>
+    <line x1="770" y1="760" x2="960" y2="830">
+      <animate attributeName="x2" values="960;1045;1000;960" dur="19s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="830;865;846;830" dur="13s" repeatCount="indefinite" />
+    </line>
+    <line x1="1115" y1="780" x2="1200" y2="650">
+      <animate attributeName="x2" values="1200;1240;1222;1200" dur="10s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="650;585;615;650" dur="11s" repeatCount="indefinite" />
+    </line>
+    <line x1="1360" y1="800" x2="1510" y2="915">
+      <animate attributeName="x2" values="1510;1568;1542;1510" dur="14s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="915;975;945;915" dur="12s" repeatCount="indefinite" />
+    </line>
+  </g>
+</svg>
