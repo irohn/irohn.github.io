@@ -23,6 +23,7 @@
   --desktop-app-icon-background: rgba(255, 255, 255, 0.05);
   --desktop-app-terminal: #f5f5f5;
   --desktop-app-browser: #d6d6d6;
+  --desktop-app-resume: #e8e8e8;
   --desktop-app-wallpaper: #dfdfdf;
   --desktop-app-indicator-active: #f5f5f5;
   --desktop-app-indicator-inactive: rgba(255, 255, 255, 0.28);
@@ -71,6 +72,7 @@
   --desktop-app-icon-background: rgba(15, 23, 42, 0.05);
   --desktop-app-terminal: #18212f;
   --desktop-app-browser: #202938;
+  --desktop-app-resume: #202938;
   --desktop-app-wallpaper: #202938;
   --desktop-app-indicator-active: #18212f;
   --desktop-app-indicator-inactive: rgba(24, 33, 47, 0.28);
@@ -170,6 +172,10 @@ body {
   cursor: pointer;
 }
 
+.desktop-app[hidden] {
+  display: none;
+}
+
 .desktop-app::after {
   content: "";
   position: absolute;
@@ -219,6 +225,16 @@ body {
 .desktop-app__icon--browser svg {
   width: 1.4rem;
   height: 1.4rem;
+  fill: currentColor;
+}
+
+.desktop-app__icon--resume {
+  color: var(--desktop-app-resume);
+}
+
+.desktop-app__icon--resume svg {
+  width: 1.35rem;
+  height: 1.35rem;
   fill: currentColor;
 }
 

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Resume - Ori Sne</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --page-background: #eeeeee;
+        --paper: #ffffff;
+        --ink: #000000;
+        --muted: #222222;
+        --rule: #000000;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        background: var(--page-background);
+        color: var(--ink);
+        font-family: "Times New Roman", Times, serif;
+      }
+
+      body {
+        padding: 1.25rem;
+      }
+
+      .resume-page {
+        width: min(100%, 8.5in);
+        min-height: 11in;
+        margin: 0 auto;
+        padding: 0.58in 0.72in;
+        background: var(--paper);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.16);
+      }
+
+      .resume-header {
+        text-align: center;
+      }
+
+      h1,
+      h2,
+      h3,
+      p,
+      ul {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin-bottom: 0.06in;
+        font-size: 29pt;
+        font-weight: 500;
+        line-height: 1;
+      }
+
+      .contact-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.16in 0.32in;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        font-size: 13.2pt;
+        line-height: 1.15;
+      }
+
+      .contact-list a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .section {
+        margin-top: 0.11in;
+      }
+
+      .section-title {
+        margin-bottom: 0.045in;
+        padding-bottom: 0.03in;
+        border-bottom: 1px solid var(--rule);
+        font-size: 17pt;
+        font-weight: 500;
+        line-height: 1.1;
+      }
+
+      .skills {
+        font-size: 12.8pt;
+        line-height: 1.14;
+      }
+
+      .skills p {
+        margin-bottom: 0.015in;
+      }
+
+      .summary {
+        margin-bottom: 0;
+        font-size: 12.8pt;
+        line-height: 1.14;
+      }
+
+      .company-heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.25in;
+        margin-bottom: 0.045in;
+        font-size: 13.8pt;
+        line-height: 1.12;
+      }
+
+      .entry {
+        margin-bottom: 0.075in;
+        break-inside: avoid;
+      }
+
+      .entry-heading,
+      .education-heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.25in;
+        font-size: 13.4pt;
+        line-height: 1.12;
+      }
+
+      .entry-title,
+      .education-school {
+        min-width: 0;
+      }
+
+      .date {
+        flex: 0 0 auto;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .role,
+      .company,
+      .school {
+        font-weight: 700;
+      }
+
+      .meta {
+        color: var(--muted);
+      }
+
+      .entry ul {
+        padding-left: 0.18in;
+        margin-bottom: 0;
+        font-size: 12.2pt;
+        line-height: 1.06;
+      }
+
+      .entry li {
+        padding-left: 0.01in;
+      }
+
+      .entry li + li {
+        margin-top: 0.018in;
+      }
+
+      .education-item {
+        margin-bottom: 0.08in;
+      }
+
+      .education-degree {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.25in;
+        margin: 0;
+        font-size: 14pt;
+        line-height: 1.12;
+      }
+
+      .print-action {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        border: 1px solid #111;
+        border-radius: 999px;
+        padding: 0.55rem 0.8rem;
+        background: #111;
+        color: #fff;
+        font: 600 0.85rem Arial, sans-serif;
+        cursor: pointer;
+      }
+
+      @media (max-width: 760px) {
+        body {
+          padding: 0;
+        }
+
+        .resume-page {
+          width: 100%;
+          min-height: auto;
+          padding: 0.35in 0.28in;
+          box-shadow: none;
+        }
+
+        h1 {
+          font-size: 25pt;
+        }
+
+        .contact-list,
+        .skills,
+        .entry-heading,
+        .education-heading,
+        .education-degree {
+          font-size: 12.5pt;
+        }
+
+        .entry ul {
+          font-size: 12pt;
+        }
+      }
+
+      @media print {
+        @page {
+          size: letter;
+          margin: 0;
+        }
+
+        html,
+        body {
+          width: 8.5in;
+          min-height: 11in;
+          background: #fff;
+        }
+
+        body {
+          padding: 0;
+        }
+
+        .resume-page {
+          width: 8.5in;
+          min-height: 11in;
+          padding: 0.58in 0.72in;
+          box-shadow: none;
+        }
+
+        .print-action {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="resume-page" aria-label="Resume">
+      <header class="resume-header">
+        <h1>Ori Sne</h1>
+        <ul class="contact-list" aria-label="Contact details">
+          <li><a href="tel:+972507231813">+972507231813</a></li>
+          <li><a href="mailto:orisneh@gmail.com">orisneh@gmail.com</a></li>
+          <li><a href="https://irohn.net">irohn.net</a></li>
+          <li><a href="https://www.linkedin.com/in/ori-sne-356a92183/">linkedin.com/in/ori-sne-356a92183</a></li>
+        </ul>
+      </header>
+
+      <section class="section" aria-labelledby="summary-heading">
+        <h2 class="section-title" id="summary-heading">Summary</h2>
+        <p class="summary">
+          Self-taught engineer focused on Linux, infrastructure, automation, networking, and developer tooling, with hands-on experience building production IoT platforms and self-hosted systems.
+        </p>
+      </section>
+
+      <section class="section" aria-labelledby="skills-heading">
+        <h2 class="section-title" id="skills-heading">Skills</h2>
+        <div class="skills">
+          <p><strong>Languages:</strong> Python • Bash • JavaScript • Lua • Nix</p>
+          <p><strong>Platforms:</strong> Linux • Kubernetes • Docker • K3s • NVIDIA Jetson • Azure</p>
+          <p><strong>Infrastructure:</strong> GitOps • FluxCD • Helm • Terraform • Ansible • GitHub Actions</p>
+          <p><strong>Networking &amp; Security:</strong> TCP/IP • DNS • DHCP • PKI • TLS • X.509 • Tailscale • Caddy • Traefik</p>
+          <p><strong>Observability:</strong> Prometheus • Grafana</p>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="experience-heading">
+        <h2 class="section-title" id="experience-heading">Experience</h2>
+
+        <div class="company-heading">
+          <div><span class="company">Greeneye Technology</span></div>
+        </div>
+
+        <article class="entry">
+          <div class="entry-heading">
+            <div class="entry-title">
+              <span class="role">Platform Engineer</span>
+            </div>
+            <div class="date">2022-Present</div>
+          </div>
+          <ul>
+            <li>Architected Kubernetes (K3s), FluxCD, Helm, and GitOps edge platform powering production IoT deployments across customer sites.</li>
+            <li>Consolidated 13 single-node clusters per sprayer into one resilient multi-node cluster, reducing cluster count by ~92% across ~40 sprayers (~520 devices).</li>
+            <li>Built cloud-to-edge pipelines for OS updates, application releases, fleet configuration, and lifecycle automation with Ansible and custom services.</li>
+            <li>Automated external lab assembly-line workflows for device connection, flashing, and testing, reducing setup time from ~1 day to ~25 minutes per device.</li>
+            <li>Designed device enrollment, PKI, certificate lifecycle management, secure provisioning, observability, and diagnostics for production edge fleets.</li>
+          </ul>
+        </article>
+
+        <article class="entry">
+          <div class="entry-heading">
+            <div class="entry-title">
+              <span class="role">Software Developer</span>
+            </div>
+            <div class="date">2021-2022</div>
+          </div>
+          <ul>
+            <li>Built production services for fleet operations, networking, remote management, telemetry, diagnostics, and operational tooling.</li>
+            <li>Developed Python automation, CAN parsers, hardware interfaces, diagnostics, and developer tooling for NVIDIA Jetson-based embedded Linux systems.</li>
+          </ul>
+        </article>
+
+        <article class="entry">
+          <div class="entry-heading">
+            <div class="entry-title">
+              <span class="role">QA Engineer</span>
+            </div>
+            <div class="date">2021</div>
+          </div>
+          <ul>
+            <li>Validated Jetson-based edge systems across software, sensors, cameras, CAN devices, and vehicle hardware before production deployment.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="section" aria-labelledby="projects-heading">
+        <h2 class="section-title" id="projects-heading">Personal Projects</h2>
+
+        <article class="entry">
+          <div class="entry-heading">
+            <div class="entry-title"><span class="role">Portable Edge Router</span></div>
+          </div>
+          <ul>
+            <li>Designed a custom FriendlyWRT/OpenWrt travel router with WWAN, multi-radio Wi-Fi, Docker services, Blocky, Caddy, Headscale/Tailscale, and Cake SQM.</li>
+          </ul>
+        </article>
+
+        <article class="entry">
+          <div class="entry-heading">
+            <div class="entry-title"><span class="role">Self-Hosted Infrastructure</span></div>
+          </div>
+          <ul>
+            <li>Operate Kubernetes and Docker infrastructure for authentication, networking, reverse proxying, monitoring, DNS, VPN, and automated deployments.</li>
+          </ul>
+        </article>
+
+        <article class="entry">
+          <div class="entry-heading">
+            <div class="entry-title"><span class="role">Developer Environment Automation</span></div>
+          </div>
+          <ul>
+            <li>Built reproducible Linux development environments using Nix, shell tooling, and automation scripts.</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+
+    <button class="print-action" type="button" onclick="window.print()">Print / Save PDF</button>
+  </body>
+</html>

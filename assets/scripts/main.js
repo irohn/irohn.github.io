@@ -12,6 +12,7 @@ const promptElements = document.querySelectorAll(".terminal__prompt");
 const desktopDock = document.querySelector("#desktop-dock");
 const terminalLauncher = document.querySelector("#terminal-launcher");
 const browserLauncher = document.querySelector("#browser-launcher");
+const resumeLauncher = document.querySelector("#resume-launcher");
 const wallpaperLauncher = document.querySelector("#wallpaper-launcher");
 const closeButton = document.querySelector("#terminal-close");
 const minimizeButton = document.querySelector("#terminal-minimize");
@@ -44,8 +45,14 @@ const browserPages = [
     label: "Search",
     path: "assets/pages/search.html",
   },
+  {
+    id: "resume",
+    label: "Resume",
+    path: "resume/",
+  },
 ];
 const browserHomePage = browserPages[0].path;
+const resumePagePath = "resume/";
 const unknownCommandMessage =
   "Command not found. Type `help commands` to see available commands.";
 const permissionDeniedMessage =
@@ -126,6 +133,7 @@ const fileSystem = createDirectory({
         pages: createDirectory({
           "links.html": createFile("Browser home page with social links"),
           "search.html": createFile("Local search page"),
+          "resume.html": createFile("Printable resume template"),
         }),
         styles: createDirectory({
           "main.css": createFile("Main site stylesheet"),
@@ -197,6 +205,15 @@ const commands = {
         "I mostly do Software Development, Devops Engineering & Automations.",
         "Feel free to explore here to find out more.",
       ]);
+    },
+  },
+  resume: {
+    description: "Open the resume template.",
+    example: "resume",
+    builtin: true,
+    run() {
+      openBrowser(resumePagePath);
+      return output(["Opening resume template..."]);
     },
   },
   pwd: {
@@ -990,11 +1007,16 @@ function syncWindowState() {
   pageShell.classList.toggle("page-shell--maximized", isAnyWindowMaximized);
   desktopDock.hidden = isAnyWindowMaximized;
   themeToggle.hidden = isAnyWindowMaximized;
+  resumeLauncher.hidden = browserWindowState === "closed" || currentBrowserPage !== resumePagePath;
   terminalLauncher.dataset.windowState = getWindowIndicatorState(
     terminalWindowState,
     terminalFocused
   );
   browserLauncher.dataset.windowState = getWindowIndicatorState(
+    browserWindowState,
+    browserFocused
+  );
+  resumeLauncher.dataset.windowState = getWindowIndicatorState(
     browserWindowState,
     browserFocused
   );
@@ -1068,6 +1090,14 @@ function isExternalBrowserTarget(target) {
 
 function getBrowserPageByPath(path) {
   return browserPages.find((page) => page.path === path) ?? null;
+}
+
+function getBrowserPageByLocation(location) {
+  return browserPages.find((page) => {
+    const pageUrl = new URL(page.path, window.location.href);
+
+    return pageUrl.pathname === location.pathname;
+  }) ?? null;
 }
 
 function closeBrowserPageMenu() {
@@ -1166,6 +1196,10 @@ function openBrowser(target) {
   });
 }
 
+function openResumeWindow() {
+  openBrowser(resumePagePath);
+}
+
 function openWallpaperWindow() {
   minimizeOtherWindows("wallpaper");
   wallpaperWindowState = "open";
@@ -1192,6 +1226,19 @@ function bindBrowserFrameFocus() {
     }
 
     setActiveWindow("browser");
+
+    try {
+      const page = getBrowserPageByLocation(browserFrame.contentWindow.location);
+
+      if (page && currentBrowserPage !== page.path) {
+        currentBrowserPage = page.path;
+        browserAddress.textContent = page.label;
+        syncBrowserPageMenu();
+        syncWindowState();
+      }
+    } catch (_error) {
+      // Cross-origin frames are expected to block access.
+    }
 
     try {
       const frameWindow = browserFrame.contentWindow;
@@ -1705,6 +1752,7 @@ terminalLauncher.addEventListener("click", openTerminal);
 browserLauncher.addEventListener("click", () => {
   openBrowser();
 });
+resumeLauncher.addEventListener("click", openResumeWindow);
 browserAddress.addEventListener("click", (event) => {
   event.stopPropagation();
   if (browserWindowState === "open") {
